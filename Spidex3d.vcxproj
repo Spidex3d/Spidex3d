@@ -139,6 +139,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Shader\Shader.cpp" />
+    <ClCompile Include="SpdLog\LogInternals.cpp" />
+    <ClCompile Include="MeshObjects\Mesh.cpp" />
+    <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\MainScreen.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
@@ -146,12 +150,39 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="vendors\imgui\imgui.cpp" />
+    <ClCompile Include="vendors\imgui\imgui_demo.cpp" />
+    <ClCompile Include="vendors\imgui\imgui_draw.cpp" />
+    <ClCompile Include="vendors\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="vendors\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="vendors\imgui\imgui_tables.cpp" />
+    <ClCompile Include="vendors\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Shader\Shader.h" />
+    <ClInclude Include="SpdLog\LogInternals.h" />
+    <ClInclude Include="MeshObjects\Mesh.h" />
+    <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\MainScreen.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="vendors\glad\glad.h" />
     <ClInclude Include="vendors\glad\glad\glad.h" />
+    <ClInclude Include="vendors\imgui\imconfig.h" />
+    <ClInclude Include="vendors\imgui\imgui.h" />
+    <ClInclude Include="vendors\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="vendors\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="vendors\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="vendors\imgui\imgui_internal.h" />
+    <ClInclude Include="vendors\imgui\imstb_rectpack.h" />
+    <ClInclude Include="vendors\imgui\imstb_textedit.h" />
+    <ClInclude Include="vendors\imgui\imstb_truetype.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Fonts\comic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\shaderFile\default.vert" />
+    <None Include="Shader\shaderFile\default.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

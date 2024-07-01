@@ -1,49 +1,209 @@
 #include "MainScreen.h"
-#include "pch.h";
+#include "../SpdLog/LogInternals.h"
+
+
 
 MainScreen* MainScreen::Instance()
 {
-	static MainScreen* screen = new MainScreen;
+    static MainScreen* screen = new MainScreen;
 
-	return screen;
+    return screen;
 }
 
 bool MainScreen::Initialize()
 {
-
+    LogInternals::Instance()->Initialize();
+    // Initialize GLFW
     if (!glfwInit())
         return -1;
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  // So this is 4.
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);  // and this .6  = 4.6
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(800, 600, "Spidex 3d Engine", NULL, NULL);
+    // set up the window here
+     window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Spidex 3d Engine", NULL, NULL);
 
+    // Did we create a window
     if (!window)
     {
-        // give an error message
-        std::cout << "Failed to Create a window" << std::endl;
         glfwTerminate();
         return -1;
-
     }
-
+    else {
+        LogInternals::Instance()->Info("Window created successfully");
+    }
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        // give an error message
-        std::cout << "Failed to Load Glad" << std::endl;
-        return -1;
+        std::cout << "Failed to loade glad" << std::endl;
+    }
+    else {
+        LogInternals::Instance()->Info("Glad Loaded Correctly");
+    }
+    
+    return true;
+}
+
+void MainScreen::SetImGui()
+{
+    
+    // ImGui set up
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO io = ImGui::GetIO();
+    io.KeyMap[ImGuiKey_H] = GLFW_KEY_HOME;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 460");
+    // Set up my own Fonts
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/comic.ttf", 16.0f);
+    ImGui::GetIO().Fonts->Build();
+    
+}
+
+void MainScreen::NewImguiFrame()
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+}
+
+void MainScreen::RenderImGui()
+{
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void MainScreen::ImGuiWindow()
+{
+    float f = 0.0f;
+    ImGui::Begin("Spidex");
+    ImGui::Text("Spidex Engine", nullptr);
+    ImGui::Button("Save");
+
+    ImGui::Text("string");
+    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+    // Edit a color stored as 4 floats
+    ImGui::ColorEdit4("Color", my_color);
+    ImGui::End();
+}
+void MainScreen::ImGuiMainMenu(GLFWwindow* window)
+{
+    // This is my main window menu
+    ImGui::BeginMainMenuBar();
+    if (ImGui::BeginMenu("File"))
+    {
+        if (ImGui::MenuItem("Creat Scean"))
+        {
+
+        }
+        if (ImGui::MenuItem("Open Scean"))
+        {
+
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Save Scean"))
+        {
+
+        }
+        if (ImGui::MenuItem("Creat Scean"))
+        {
+
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Exit"))
+        {
+            glfwSetWindowShouldClose(window, true);
+        }
+        ImGui::EndMenu();
+
+    }
+    if (ImGui::BeginMenu("Edit"))
+    {
+        if (ImGui::MenuItem("Cut"))
+        {
+
+        }
+        ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("View"))
+    {
+        if (ImGui::MenuItem("Hi"))
+        {
+
+        }
+        ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Help"))
+    {
+        if (ImGui::MenuItem("Hi"))
+        {
+
+        }
+        ImGui::EndMenu();
     }
 
-	return true;
+    ImGui::EndMainMenuBar();
+}
+
+void MainScreen::ConsolPanel()
+{
+    ImGui::Begin("Output Console", nullptr,
+        ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_::ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse);
+    auto WindowPos = ImVec2(0, SCR_HEIGHT - CONSOLE_PANEL_HEIGHT - 25); // set the height of the concol window
+    auto WindowSize = ImVec2(SCR_WIDTH, CONSOLE_PANEL_HEIGHT);
+
+    ImGui::SetWindowPos("Output Console", WindowPos);
+    ImGui::SetWindowSize("Output Console", WindowSize);
+    ImGuiIO io = ImGui::GetIO();
+
+    // ImGui::Text("App average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate);
+    ImGui::Text("Mouse pos X %.3f Mouse pos Y %.3f", io.MousePos.x, io.MousePos.y);
+
+    ImGui::End();
+    // needs to be resized on window resize
+
+
+
+}
+
+void MainScreen::Run()
+{
+    // do the while loop here
+     while (!glfwWindowShouldClose(window))
+    {
+
+        MainScreen::Instance()->PollEvents();
+       
+        MainScreen::Instance()->Input();
+       
+        MainScreen::Instance()->NewImguiFrame(); // 1
+
+        MainScreen::Instance()->ImGuiMainMenu(window);//2
+        MainScreen::Instance()->ConsolPanel(); // 3
+        MainScreen::Instance()->ImGuiWindow();  // 4
+
+        MainScreen::Instance()->BgColour();
+
+        MainScreen::Instance()->ClearScreen();
+        
+        MainScreen::Instance()->RenderImGui(); // 5 Put them in this order
+
+        Mesh::Instance()->Initialize(); // Draw a Triangel
+
+        MainScreen::Instance()->SplatBuffers();
+
+    }
+
+
+    
 }
 
 void MainScreen::ClearScreen()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void MainScreen::SplatBuffers()
@@ -54,15 +214,31 @@ void MainScreen::SplatBuffers()
 void MainScreen::PollEvents()
 {
     glfwPollEvents();
+    
 }
 
 void MainScreen::ShutDown()
 {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
+    glfwTerminate();
+
+    LogInternals::Instance()->Info("Engine shutdown successfully");
 }
 
 void MainScreen::BgColour()
 {
-    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+    glClearColor(my_color[0], my_color[1], my_color[2], 1.0f);
+
+}
+
+// get the keyboard and mouse input
+void MainScreen::Input()
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        //std::cout << "KEY ESCAPE PRESSED" << std::endl;
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
 
 }

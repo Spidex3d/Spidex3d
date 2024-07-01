@@ -1,35 +1,23 @@
-#include "MainScreen.h"
 #include "pch.h"
+#include "MainScreen.h"
 
 
-bool IsRunning = true;
 int main(void)
 {
-
+    // Initialize the main window
     MainScreen::Instance()->Initialize();
 
- 
+    MainScreen::Instance()->SetImGui(); // ImGui setup
+
     // get the current opengl version number.
     std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
 
-    while (IsRunning)
-    {
-        MainScreen::Instance()->BgColour();
-
-        MainScreen::Instance()->ClearScreen();
-
-        MainScreen::Instance()->SplatBuffers();
-
-        MainScreen::Instance()->PollEvents();
-
-        
-    }
-
-    glfwTerminate();
-
-    std::cout << "End Game" << std::endl;
-
-
+    // Run The engine
+    MainScreen::Instance()->Run();
+    
+    // close it all down and go to bed.
+    // includes Imgui stuff
+    MainScreen::Instance()->ShutDown();
 
     return 0;
 }
