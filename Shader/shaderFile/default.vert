@@ -1,11 +1,10 @@
 #version 460
 
-in vec3 vertexIn;
-in vec4 colorIn;
-out vec4 colorOut;
-
-void main()
-{
-	colorOut = colorIn;
-	gl_Position - position;
-}
+    layout (location = 0) in vec3 aPos;
+    layout (location = 1) in vec3 aColor;
+    out vec3 myColor;
+    void main()
+    {
+       gl_Position = vec4(aPos, 1.0);
+       myColor = aColor;
+    };

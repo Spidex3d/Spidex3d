@@ -109,14 +109,15 @@ bool Shader::CompileShaders(const std::string& filename, ShaderType shaderType)
 
 	if (errorCode == GL_TRUE)
 	{
-		LogInternals::Instance()->Info(" Shader Compilation successfull!");
+		//LogInternals::Instance()->Info(" Shader Compilation successfull!");
+		//std::cout << "Shader Compilation successfull!" << std::endl;
 	}
 	else {
 		GLchar errorMessage[1000];
 		GLsizei bufferSize = 1000;
 
 		glGetShaderInfoLog(shaderID, bufferSize, &bufferSize, errorMessage);
-		LogInternals::Instance()->Error(errorMessage);
+		std::cout << errorMessage << std::endl;
 	}
 	return true;
 }
@@ -136,14 +137,15 @@ bool Shader::LinkProgram()
 
 	if (errorCode == GL_TRUE)
 	{
-		LogInternals::Instance()->Info("Shader linking successful");
+		
+		//std::cout << "Shader linking successful" << std::endl;
 	}
 	else {
 		GLchar errorMessage[1000];
 		GLsizei bufferSize = 1000;
 
 		glGetShaderInfoLog(m_shaderProgramID, bufferSize, &bufferSize, errorMessage);
-		LogInternals::Instance()->Error(errorMessage);
+		std::cout << errorMessage << std::endl;
 	}
 
 	return true;
