@@ -121,4 +121,9 @@
     <None Include="Shader\shaderFile\default.frag" />
     <None Include="Shader\shaderFile\default.vert" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Textures\crate.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

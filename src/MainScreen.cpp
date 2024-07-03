@@ -40,6 +40,12 @@ bool MainScreen::Initialize()
         LogInternals::Instance()->Info("Glad Loaded Correctly");
     }
     
+    // add the Spidex Icon
+    GLFWimage images[1];
+    images[0].pixels = stbi_load("Textures/icon2.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+    glfwSetWindowIcon(window, 1, images);
+    stbi_image_free(images[0].pixels);
+    
     return true;
 }
 
@@ -189,9 +195,10 @@ void MainScreen::Run()
 
         MainScreen::Instance()->ClearScreen();
         
+        Mesh::Instance()->Initialize(); // Draw a Triangel
+
         MainScreen::Instance()->RenderImGui(); // 5 Put them in this order
 
-        Mesh::Instance()->Initialize(); // Draw a Triangel
 
         MainScreen::Instance()->SplatBuffers();
 
@@ -219,6 +226,7 @@ void MainScreen::PollEvents()
 
 void MainScreen::ShutDown()
 {
+    
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

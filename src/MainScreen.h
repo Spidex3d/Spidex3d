@@ -35,6 +35,8 @@ public:
 	void PollEvents();
 	void ShutDown();
 
+	// framebuffer_size_callback needs Adding
+
 	void BgColour();
 
 	void Input();
