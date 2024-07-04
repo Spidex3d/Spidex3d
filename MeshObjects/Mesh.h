@@ -14,14 +14,14 @@ public:
 
 	void DrawTriangel();
 
-//private:
+private:
 	float vertices[32] =
 	{
         // positions          // colors           // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+         0.5f,  0.8f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
          0.5f, -0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
         -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 1.0f,   0.0f, 1.0f  // top left 
+        -0.5f,  0.8f, 0.0f,   1.0f, 1.0f, 1.0f,   0.0f, 1.0f  // top left 
     };
     unsigned int indices[6] = {  
         0, 1, 3, // first triangle
@@ -29,16 +29,21 @@ public:
     };
 	
 	/*
+	 0.5f,  0.5f, 0.0f,
+	 0.5f, -0.5f, 0.0f,
+	-0.5f, -0.5f, 0.0f,
+	-0.5f,  0.5f, 0.0f, 
+	
 	float vertices[36] = {
 		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),(void*)0);
 		// first triangle      Colour
-		-0.5f,  -0.5f,  0.0f, 1.0f, 0.0f, 0.0f,
-		 0.5f,  -0.5f,  0.0f, 0.0f, 1.0f, 0.0f,
-		 0.5f,   0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 
-		 // second triangle    Colour
-		 0.5f,   0.5f,  0.0f, 0.0f, 0.0f, 1.0f,
-		-0.5f,   0.5f,  0.0f, 0.0f, 1.0f, 0.0f,
-		-0.5f,  -0.5f,  0.0f, 1.0f, 0.0f, 0.0f 
+		-0.5f,  -0.5f,  0.0f,  1.0f, 0.0f, 0.0f,
+		 0.5f,  -0.5f,  0.0f,  0.0f, 1.0f, 0.0f,
+		 0.5f,   0.5f,  0.0f,  0.0f, 0.0f, 1.0f, 
+		 // second triangle     Colour
+		 0.5f,   0.5f,  0.0f,  0.0f, 0.0f, 1.0f,
+		-0.5f,   0.5f,  0.0f,  0.0f, 1.0f, 0.0f,
+		-0.5f,  -0.5f,  0.0f,  1.0f, 0.0f, 0.0f 
 	};
 	
 		*/

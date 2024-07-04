@@ -31,14 +31,8 @@ bool Mesh::Initialize()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	//#########################################
-	// put the buffer stuff in here
-	//unsigned int buffer;
-	//glGenBuffers(1, &buffer);
-	//glBindBuffer(GL_ARRAY_BUFFER, buffer);
-
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	//location = 0 attribute 3 vertices        strid 6				start at 0
+	
+	//location = 0 attribute 3 vertices        strid 8				start at 0
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// colour location = 1
@@ -59,8 +53,8 @@ bool Mesh::Initialize()
 	// set texture filtering parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load image, create texture and generate mipmaps
 	
+	// flip image
 	stbi_set_flip_vertically_on_load(true);
 
 	int width, height, nrChannels;
@@ -79,24 +73,13 @@ bool Mesh::Initialize()
 		std::cout << "Failed to load texture" << std::endl;
 	}
 	stbi_image_free(data);
-	//*******************************
 	
 	
-
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindBuffer(GL_ARRAY_BUFFER, 1);
-
-	//glBindVertexArray(0);
-	//glBindVertexArray(1);
-
-	//glBindTexture(GL_TEXTURE_2D, texture);
 	defaultShader.Use();
-	//glBindVertexArray(VAO);
-	
+		
 	glBindVertexArray(VAO);
-	//Mesh::DrawTriangel();
+	Mesh::DrawTriangel();
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	defaultShader.Destroy();
 
 	return true;
@@ -105,7 +88,8 @@ bool Mesh::Initialize()
 void Mesh::DrawTriangel()
 {
 	
-	// GL Draw Triangel
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	
 	//glDrawArrays(GL_TRIANGLES, 0, 6);
 	
 }
