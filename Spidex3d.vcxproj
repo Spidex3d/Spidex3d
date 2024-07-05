@@ -165,6 +165,7 @@
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\MainScreen.h" />
     <ClInclude Include="src\pch.h" />
+    <ClInclude Include="src\Textures.h" />
     <ClInclude Include="vendors\glad\glad.h" />
     <ClInclude Include="vendors\glad\glad\glad.h" />
     <ClInclude Include="vendors\imgui\imconfig.h" />
@@ -185,6 +186,7 @@
     <None Include="Shader\shaderFile\default.frag" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\Temp\TestOpenGL\Textures\crate.jpg" />
     <Image Include="Textures\crate.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -47,8 +47,6 @@ private:
 
 	const int CONSOLE_PANEL_HEIGHT = 200;
 
-	
-
 
 };
 

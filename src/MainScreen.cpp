@@ -39,10 +39,11 @@ bool MainScreen::Initialize()
     else {
         LogInternals::Instance()->Info("Glad Loaded Correctly");
     }
+
     
     // Load an icon
     GLFWimage images[1];
-    images[0].pixels = stbi_load("Textures/icon2.png", &images[0].width, &images[0].height, 0, 4); // rgba = png
+    images[0].pixels = stbi_load("Textures/Icon.png", &images[0].width, &images[0].height, 0, 4); // rgba = png
     glfwSetWindowIcon(window, 1, images);
     stbi_image_free(images[0].pixels);
     
