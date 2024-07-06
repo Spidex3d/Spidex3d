@@ -8,9 +8,10 @@
 #include <GLFW\glfw3.h>
 #include "../MeshObjects/Mesh.h"
 #include "pch.h"
+#include "Common.h"
 
-const int SCR_WIDTH = 1920;
-const int SCR_HEIGHT = 1080;
+//const int SCR_WIDTH = 1920;
+//const int SCR_HEIGHT = 1080;
 
 class MainScreen
 {
@@ -29,6 +30,9 @@ public:
 	void ConsolPanel();
 	// ImGui End
 	void Run();
+
+	void SetViewPort(GLint x, GLint y, GLsizei width, GLsizei height);
+	//void ScreenResize();
 
 	void ClearScreen();
 	void SplatBuffers();

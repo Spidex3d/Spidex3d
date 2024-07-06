@@ -159,9 +159,11 @@
     <ClCompile Include="vendors\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MeshObjects\Vertices.h" />
     <ClInclude Include="Shader\Shader.h" />
     <ClInclude Include="SpdLog\LogInternals.h" />
     <ClInclude Include="MeshObjects\Mesh.h" />
+    <ClInclude Include="src\Common.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\MainScreen.h" />
     <ClInclude Include="src\pch.h" />

@@ -40,6 +40,10 @@ bool MainScreen::Initialize()
         LogInternals::Instance()->Info("Glad Loaded Correctly");
     }
 
+    glEnable(GL_DEPTH_TEST);
+
+    SetViewPort(0, CONSOLE_PANEL_HEIGHT, SCR_WIDTH, SCR_HEIGHT - CONSOLE_PANEL_HEIGHT);
+
     
     // Load an icon
     GLFWimage images[1];
@@ -159,7 +163,8 @@ void MainScreen::ConsolPanel()
         ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_::ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse);
-    auto WindowPos = ImVec2(0, SCR_HEIGHT - CONSOLE_PANEL_HEIGHT - 25); // set the height of the concol window
+    auto WindowPos = ImVec2(0, SCR_HEIGHT - CONSOLE_PANEL_HEIGHT - 25); // set the height of the consol window
+   
     auto WindowSize = ImVec2(SCR_WIDTH, CONSOLE_PANEL_HEIGHT);
 
     ImGui::SetWindowPos("Output Console", WindowPos);
@@ -207,6 +212,11 @@ void MainScreen::Run()
 
 
     
+}
+
+void MainScreen::SetViewPort(GLint x, GLint y, GLsizei width, GLsizei height)
+{
+    glViewport(x, y, width, height);
 }
 
 void MainScreen::ClearScreen()

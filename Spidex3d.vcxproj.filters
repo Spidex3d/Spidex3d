@@ -116,6 +116,12 @@
     <ClInclude Include="src\Textures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MeshObjects\Vertices.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="Fonts\comic.ttf" />

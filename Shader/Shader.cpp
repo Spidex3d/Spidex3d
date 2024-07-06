@@ -228,7 +228,12 @@ bool Shader::SendUniformData(const std::string& uniformName, GLfloat x, GLfloat 
 	glUniform4f(ID, x, y, z, w);
 	return true;
 }
-
+/*
+void setMat4(const std::string& name, const glm::mat4& mat) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+*/
 bool Shader::SendUniformData(const std::string& uniformName, const glm::mat4& data) const
 {
 	GLint ID = glGetUniformLocation(m_shaderProgramID, uniformName.c_str());
