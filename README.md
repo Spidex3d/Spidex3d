@@ -11,7 +11,7 @@ my aim is to go from all but zero to making a games engine using Opengl.
 follow along and watch me make a complete fool of myself.
 ✨ Week 3 Progerss 
 ✨ It's 3d.
-![image_alt](https://github.com/Spidex3d/Spidex3d/blob/81cf821299fb264ae0e2efdabf63641de2c4381b/Readme/its_3d.jpg)
+![image_alt](https://github.com/Spidex3d/Spidex3d/blob/65df376a30f54b6c0bf6635365fc411139af044d/Readme/its_3d.jpg)
 
 ✨ Week 2 Progerss 
 ✨ Textures
