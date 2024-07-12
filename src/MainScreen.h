@@ -6,7 +6,14 @@
 
 #include <glad\glad.h>
 #include <GLFW\glfw3.h>
-#include "../MeshObjects/Mesh.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <stb\stb_image.h>
+//#include "../MeshObjects/Mesh.h"
+
 #include "pch.h"
 #include "Common.h"
 
@@ -20,16 +27,16 @@ public:
 
 	static MainScreen* Instance();
 
-	bool Initialize();
+	void Initialize(GLFWwindow* window);
 	// ImGui Start
-	void SetImGui();
-	void NewImguiFrame();
-	void RenderImGui();
-	void ImGuiWindow();
+	void SetImGui(GLFWwindow* window);
+	void NewImguiFrame(GLFWwindow* window);
+	void RenderImGui(GLFWwindow* window);
+	void ImGuiWindow(GLFWwindow* window);
 	void ImGuiMainMenu(GLFWwindow* window);
-	void ConsolPanel();
+	void ConsolPanel(GLFWwindow* window);
 	// ImGui End
-	void Run();
+	
 
 	void SetViewPort(GLint x, GLint y, GLsizei width, GLsizei height);
 	//void ScreenResize();
@@ -44,10 +51,12 @@ public:
 	void BgColour();
 
 	void Input();
+	float scale_value[3] = { 0.3f, 0.3f, 0.3f };
 
 private:
 	GLFWwindow* window;
 	float my_color[3] = { 0.0f, 0.0f, 0.0f };
+	
 
 	const int CONSOLE_PANEL_HEIGHT = 200;
 

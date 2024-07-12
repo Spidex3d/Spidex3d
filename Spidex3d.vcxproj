@@ -141,8 +141,6 @@
   <ItemGroup>
     <ClCompile Include="Shader\Shader.cpp" />
     <ClCompile Include="SpdLog\LogInternals.cpp" />
-    <ClCompile Include="MeshObjects\Mesh.cpp" />
-    <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\MainScreen.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
@@ -159,12 +157,13 @@
     <ClCompile Include="vendors\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MeshObjects\Mesh.h" />
     <ClInclude Include="MeshObjects\Vertices.h" />
     <ClInclude Include="Shader\Shader.h" />
     <ClInclude Include="SpdLog\LogInternals.h" />
-    <ClInclude Include="MeshObjects\Mesh.h" />
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Common.h" />
-    <ClInclude Include="src\Input.h" />
+    <ClInclude Include="src\GameInput.h" />
     <ClInclude Include="src\MainScreen.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Textures.h" />

@@ -1,5 +1,7 @@
 #include "MainScreen.h"
 #include "../SpdLog/LogInternals.h"
+//#include "GameInput.h"
+
 
 
 
@@ -10,27 +12,10 @@ MainScreen* MainScreen::Instance()
     return screen;
 }
 
-bool MainScreen::Initialize()
-{
-    LogInternals::Instance()->Initialize();
-    // Initialize GLFW
-    if (!glfwInit())
-        return -1;
+void MainScreen::Initialize(GLFWwindow* window)
+{   
+   
 
-
-    // set up the window here
-     window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Spidex 3d Engine", NULL, NULL);
-
-    // Did we create a window
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
-    else {
-        LogInternals::Instance()->Info("Window created successfully");
-    }
-    glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -40,21 +25,15 @@ bool MainScreen::Initialize()
         LogInternals::Instance()->Info("Glad Loaded Correctly");
     }
 
-    glEnable(GL_DEPTH_TEST);
-
-    SetViewPort(0, CONSOLE_PANEL_HEIGHT, SCR_WIDTH, SCR_HEIGHT - CONSOLE_PANEL_HEIGHT);
-
-    
     // Load an icon
     GLFWimage images[1];
     images[0].pixels = stbi_load("Textures/Icon.png", &images[0].width, &images[0].height, 0, 4); // rgba = png
     glfwSetWindowIcon(window, 1, images);
     stbi_image_free(images[0].pixels);
-    
-    return true;
+
 }
 
-void MainScreen::SetImGui()
+void MainScreen::SetImGui(GLFWwindow* window)
 {
     
     // ImGui set up
@@ -71,7 +50,7 @@ void MainScreen::SetImGui()
     
 }
 
-void MainScreen::NewImguiFrame()
+void MainScreen::NewImguiFrame(GLFWwindow* window)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -79,13 +58,13 @@ void MainScreen::NewImguiFrame()
 
 }
 
-void MainScreen::RenderImGui()
+void MainScreen::RenderImGui(GLFWwindow* window)
 {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void MainScreen::ImGuiWindow()
+void MainScreen::ImGuiWindow(GLFWwindow* window)
 {
     float f = 0.0f;
     ImGui::Begin("Spidex");
@@ -96,6 +75,10 @@ void MainScreen::ImGuiWindow()
     ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
     // Edit a color stored as 4 floats
     ImGui::ColorEdit4("Color", my_color);
+    ImGui::Spacing();
+    ImGui::DragFloat3("Scale", scale_value, 0.3f, 0.3f, 0.3f);
+    //ImGuiIO io = ImGui::GetIO();
+    //ImGui::Text("App average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
     ImGui::End();
 }
 void MainScreen::ImGuiMainMenu(GLFWwindow* window)
@@ -157,13 +140,13 @@ void MainScreen::ImGuiMainMenu(GLFWwindow* window)
     ImGui::EndMainMenuBar();
 }
 
-void MainScreen::ConsolPanel()
+void MainScreen::ConsolPanel(GLFWwindow* window)
 {
     ImGui::Begin("Output Console", nullptr,
         ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_::ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse);
-    auto WindowPos = ImVec2(0, SCR_HEIGHT - CONSOLE_PANEL_HEIGHT - 25); // set the height of the consol window
+    auto WindowPos = ImVec2(0, SCR_HEIGHT - CONSOLE_PANEL_HEIGHT - 5); // set the height of the consol window
    
     auto WindowSize = ImVec2(SCR_WIDTH, CONSOLE_PANEL_HEIGHT);
 
@@ -179,39 +162,6 @@ void MainScreen::ConsolPanel()
 
 
 
-}
-
-void MainScreen::Run()
-{
-    // do the while loop here
-     while (!glfwWindowShouldClose(window))
-    {
-
-        MainScreen::Instance()->PollEvents();
-       
-        MainScreen::Instance()->Input();
-       
-        MainScreen::Instance()->NewImguiFrame(); // 1
-
-        MainScreen::Instance()->ImGuiMainMenu(window);//2
-        MainScreen::Instance()->ConsolPanel(); // 3
-        MainScreen::Instance()->ImGuiWindow();  // 4
-
-        MainScreen::Instance()->BgColour();
-
-        MainScreen::Instance()->ClearScreen();
-        
-        Mesh::Instance()->Initialize(); // Draw a Triangel
-
-        MainScreen::Instance()->RenderImGui(); // 5 Put them in this order
-
-
-        MainScreen::Instance()->SplatBuffers();
-
-    }
-
-
-    
 }
 
 void MainScreen::SetViewPort(GLint x, GLint y, GLsizei width, GLsizei height)
@@ -236,7 +186,7 @@ void MainScreen::PollEvents()
 }
 
 void MainScreen::ShutDown()
-{
+{  
     
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
