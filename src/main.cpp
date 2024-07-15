@@ -9,6 +9,8 @@
 
 #include "GameInput.h"
 
+// ImGui docking test Sat 13/07/24
+
 //void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 //void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 //void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -21,7 +23,7 @@ unsigned int defaultMap;
 int main(void)
 {
     LogInternals::Instance()->Initialize();
-
+    
     if (!glfwInit())
         return -1;
 
@@ -44,6 +46,8 @@ int main(void)
     }
     
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1); // Enable vsync
+
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
@@ -98,9 +102,14 @@ int main(void)
         
 
         MainScreen::Instance()->NewImguiFrame(window); // 1
+        bool doc = true;
+        MainScreen::Instance()->MainDockSpace(&doc); // Docking Space
+          
         MainScreen::Instance()->ImGuiMainMenu(window);//2
         MainScreen::Instance()->ConsolPanel(window); // 3
         MainScreen::Instance()->ImGuiWindow(window);  // 4
+
+        MainScreen::Instance()->MainScean(window); // this is the main Scean window to draw the objects in
 
         MainScreen::Instance()->BgColour();
 

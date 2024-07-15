@@ -6,7 +6,8 @@
 //  [X] Platform: Keyboard support. Since 1.87 we are using the io.AddKeyEvent() function. Pass ImGuiKey values to all key functions e.g. ImGui::IsKeyPressed(ImGuiKey_Space). [Legacy ALLEGRO_KEY_* values will also be supported unless IMGUI_DISABLE_OBSOLETE_KEYIO is set]
 //  [X] Platform: Clipboard support (from Allegro 5.1.12)
 //  [X] Platform: Mouse cursor shape and visibility. Disable with 'io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange'.
-// Issues:
+// Missing features:
+//  [ ] Renderer: Multi-viewport support (multiple windows)..
 //  [ ] Renderer: The renderer is suboptimal as we need to convert vertices manually.
 //  [ ] Platform: Missing gamepad support.
 
@@ -62,8 +63,8 @@
 #ifdef _WIN32
 #include <allegro5/allegro_windows.h>
 #endif
-#define ALLEGRO_HAS_CLIPBOARD           (ALLEGRO_VERSION_INT >= ((5 << 24) | (1 << 16) | (12 << 8))) // Clipboard only supported from Allegro 5.1.12
-#define ALLEGRO_HAS_DRAW_INDEXED_PRIM   (ALLEGRO_VERSION_INT >= ((5 << 24) | (2 << 16) | ( 5 << 8))) // DX9 implementation of al_draw_indexed_prim() got fixed in Allegro 5.2.5
+#define ALLEGRO_HAS_CLIPBOARD           ((ALLEGRO_VERSION_INT & ~ALLEGRO_UNSTABLE_BIT) >= ((5 << 24) | (1 << 16) | (12 << 8))) // Clipboard only supported from Allegro 5.1.12
+#define ALLEGRO_HAS_DRAW_INDEXED_PRIM   ((ALLEGRO_VERSION_INT & ~ALLEGRO_UNSTABLE_BIT) >= ((5 << 24) | (2 << 16) | ( 5 << 8))) // DX9 implementation of al_draw_indexed_prim() got fixed in Allegro 5.2.5
 
 // Visual Studio warnings
 #ifdef _MSC_VER

@@ -32,10 +32,17 @@ public:
 	void SetImGui(GLFWwindow* window);
 	void NewImguiFrame(GLFWwindow* window);
 	void RenderImGui(GLFWwindow* window);
+	
+	void MainDockSpace(bool* p_open);
+	
+	void MainScean(GLFWwindow* window);
+
 	void ImGuiWindow(GLFWwindow* window);
 	void ImGuiMainMenu(GLFWwindow* window);
+	
 	void ConsolPanel(GLFWwindow* window);
 	// ImGui End
+
 	
 
 	void SetViewPort(GLint x, GLint y, GLsizei width, GLsizei height);
@@ -53,10 +60,17 @@ public:
 	void Input();
 	float scale_value[3] = { 0.3f, 0.3f, 0.3f };
 
+
+
 private:
 	GLFWwindow* window;
+
 	float my_color[3] = { 0.0f, 0.0f, 0.0f };
+
+	bool show_demo_window = true;
+	bool show_another_window = false;
 	
+	glm::vec2 mSize;
 
 	const int CONSOLE_PANEL_HEIGHT = 200;
 
