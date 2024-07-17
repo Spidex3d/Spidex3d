@@ -12,6 +12,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <stb\stb_image.h>
+
 //#include "../MeshObjects/Mesh.h"
 
 #include "pch.h"
@@ -33,10 +34,10 @@ public:
 	void NewImguiFrame(GLFWwindow* window);
 	void RenderImGui(GLFWwindow* window);
 	
-	void MainDockSpace(bool* p_open);
-	
-	void MainScean(GLFWwindow* window);
+	void MainDockSpace(bool* p_open); // docking space
 
+	void MainScean(GLFWwindow* window); // Drawing to an ImGui Scean Window
+	
 	void ImGuiWindow(GLFWwindow* window);
 	void ImGuiMainMenu(GLFWwindow* window);
 	
@@ -70,7 +71,6 @@ private:
 	bool show_demo_window = true;
 	bool show_another_window = false;
 	
-	glm::vec2 mSize;
 
 	const int CONSOLE_PANEL_HEIGHT = 200;
 
