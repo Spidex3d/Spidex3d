@@ -13,7 +13,7 @@ follow along and watch me make a complete fool of myself.
 ✨ ImGui Render in an ImGui Window
 ![image_alt](https://github.com/Spidex3d/Spidex3d/blob/81cf821299fb264ae0e2efdabf63641de2c4381b/Readme/render_Imgui.jpg)
 ✨ ImGui Docking
-![image_alt](https://github.com/Spidex3d/Spidex3d/blob/81cf821299fb264ae0e2efdabf63641de2c4381b/Readme/Docking.jpg)
+![image_alt](https://github.com/Spidex3d/Spidex3d/blob/4ce858e04a7e00c81f57c244352758bbe8701e74/Readme/Docking.jpg)
 ✨ Week 2 Progerss 
 ✨ Textures
 ![image_alt](https://github.com/Spidex3d/Spidex3d/blob/81cf821299fb264ae0e2efdabf63641de2c4381b/Readme/Textures.jpg)
