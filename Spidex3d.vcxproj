@@ -157,6 +157,7 @@
     <ClCompile Include="vendors\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Buffers\Buffers.h" />
     <ClInclude Include="MeshObjects\Mesh.h" />
     <ClInclude Include="MeshObjects\Vertices.h" />
     <ClInclude Include="Shader\Shader.h" />

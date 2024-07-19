@@ -38,13 +38,21 @@ public:
 
 	void MainScean(GLFWwindow* window); // Drawing to an ImGui Scean Window
 	
-	void ImGuiWindow(GLFWwindow* window);
+	void ImGuiElimentWindow(GLFWwindow* window);
+
+	void ImGuiPropertiesPanel(GLFWwindow* window);
+
 	void ImGuiMainMenu(GLFWwindow* window);
 	
 	void ConsolPanel(GLFWwindow* window);
+
+	void AboutWindow(GLFWwindow* window); //About Window from the main menu
 	// ImGui End
 
-	
+	void Creat_FrameBuffer();
+	void Bind_Framebuffer();
+	void Unbinde_Frambuffer();
+	void Rescale_frambuffer(float width, float height);
 
 	void SetViewPort(GLint x, GLint y, GLsizei width, GLsizei height);
 	//void ScreenResize();
@@ -65,11 +73,15 @@ public:
 
 private:
 	GLFWwindow* window;
+	GLuint FBO;
+	GLuint RBO;
+	GLuint texture_id;
 
 	float my_color[3] = { 0.0f, 0.0f, 0.0f };
 
-	bool show_demo_window = true;
+	bool show_demo_window = false;
 	bool show_another_window = false;
+	bool show_about_window = false;
 	
 
 	const int CONSOLE_PANEL_HEIGHT = 200;

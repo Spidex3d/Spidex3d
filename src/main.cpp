@@ -6,73 +6,16 @@
 
 #include "../MeshObjects/Mesh.h"
 #include "Textures.h"
+//#include "../Buffers/Buffers.h"
 
 #include "GameInput.h"
 
 // ImGui docking test Sat 13/07/24
 
-//void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-//void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-//void processInput(GLFWwindow* window);
-GLuint FBO;
-GLuint RBO;
-GLuint texture_id;
-
 
 Shader defaultShader;
 
 unsigned int defaultMap;
-
-void Creat_FrameBuffer()
-{
-
-    glGenFramebuffers(1, &FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-
-    glGenTextures(1, &texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_id, 0);
-
-    glGenRenderbuffers(1, &RBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR FRAMBUFFER:: framebuffer is not compleate!" << std::endl;
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-}
-void Bind_Framebuffer()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-}
-void Unbinde_Frambuffer()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-}
-void Rescale_frambuffer(float width, float height)
-{
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_id, 0);
-
-
-    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-}
-
 
 int main(void)
 {
@@ -138,8 +81,8 @@ int main(void)
    
 
     glEnable(GL_DEPTH_TEST);
-    Creat_FrameBuffer();
-
+    //Creat_FrameBuffer();
+    MainScreen::Instance()->Creat_FrameBuffer();
     //SetViewPort(0, CONSOLE_PANEL_HEIGHT, SCR_WIDTH, SCR_HEIGHT - CONSOLE_PANEL_HEIGHT);
 
 
@@ -161,8 +104,8 @@ int main(void)
         MainScreen::Instance()->PollEvents();
 
        
-
-        MainScreen::Instance()->NewImguiFrame(window); // 1
+        // ################## Start ImGui ####################################
+        MainScreen::Instance()->NewImguiFrame(window); // 1 New ImGui Frame
 
        // MainScreen::Instance()->ClearScreen();
 
@@ -172,37 +115,23 @@ int main(void)
         MainScreen::Instance()->MainDockSpace(&doc); // Docking
 
 
-        //MainScreen::Instance()->MainScean(window); // This is the ImGui Window which we are trying to draw are cube in
-        // ########################## IMGUI ##################
+        MainScreen::Instance()->MainScean(window); // This is the ImGui Window which we are drawing are cube in
         
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        ImGui::Begin("Main Scean");
-        const float window_width = ImGui::GetContentRegionAvail().x;
-        const float window_height = ImGui::GetContentRegionAvail().y;
+    
 
-        Rescale_frambuffer(window_width, window_height);
-        glViewport(0, 0, window_width, window_height);
-
-        ImVec2 pos = ImGui::GetCursorScreenPos();
-
-        ImGui::GetWindowDrawList()->AddImage((void *)texture_id, ImVec2(pos.x, pos.y),
-             ImVec2(pos.x + window_width, pos.y + window_height), ImVec2(0, 1), ImVec2(1, 0));
-
-        ImGui::End();
-        ImGui::PopStyleVar();
-        
-        // ########################## END IMGUI ##############
-
-        MainScreen::Instance()->ImGuiMainMenu(window);//2
+        MainScreen::Instance()->ImGuiMainMenu(window);//2 Main Window Menu
+        MainScreen::Instance()->ImGuiPropertiesPanel(window); // New Prop Panel right of screen
         MainScreen::Instance()->ConsolPanel(window); // 3
-        MainScreen::Instance()->ImGuiWindow(window);  // 4
+        MainScreen::Instance()->ImGuiElimentWindow(window);  // 4 Eliments Panel left 
+        MainScreen::Instance()->AboutWindow(window); // About Window
         
-        Bind_Framebuffer();
+        MainScreen::Instance()->Bind_Framebuffer();  // Bind the new Frambuffer
+        
+        //############################# End ImGui ############
 
         MainScreen::Instance()->BgColour();
 
 
-        //#########################################
 
 
         defaultShader.Use();
@@ -238,8 +167,9 @@ int main(void)
             
        
         
-        Unbinde_Frambuffer();
+        MainScreen::Instance()->Unbinde_Frambuffer();
 
+        // ############ ImGui Render ######################
         MainScreen::Instance()->RenderImGui(window); // 5 Put them in this order
 
 
@@ -253,9 +183,9 @@ int main(void)
     // close it all down and go to bed.
     // it includes the Imgui stuff
     MainScreen::Instance()->ShutDown();
-    glDeleteFramebuffers(1, &FBO);
-    glDeleteTextures(1, &texture_id);
-    glDeleteRenderbuffers(1, &RBO);
+   // glDeleteFramebuffers(1, &FBO);
+   // glDeleteTextures(1, &texture_id);
+   // glDeleteRenderbuffers(1, &RBO);
 
     return 0;
 }

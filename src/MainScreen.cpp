@@ -1,7 +1,8 @@
 #include "MainScreen.h"
 #include "../SpdLog/LogInternals.h"
 //#include "GameInput.h"
-//#include "../MeshObjects/Mesh.h"
+//include "../MeshObjects/Mesh.h"
+
 
 
 
@@ -49,7 +50,7 @@ void MainScreen::SetImGui(GLFWwindow* window)
     ImGui_ImplOpenGL3_Init("#version 460");
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     // Set up my own Fonts
-    ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/comic.ttf", 16.0f);
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/comic.ttf", 28.0f);
     ImGui::GetIO().Fonts->Build();
     
 }
@@ -169,52 +170,164 @@ void MainScreen::MainDockSpace(bool* p_open)
 // Main ImGui Scean Window To Draw to
 void MainScreen::MainScean(GLFWwindow* window)
 {
-    /*
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-    ImGui::Begin("Main Scean");
-    const float window_width = ImGui::GetContentRegionAvail().x;
-    const float window_height = ImGui::GetContentRegionAvail().y;
+    
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        ImGui::Begin("Main Scean");
+        const float window_width = ImGui::GetContentRegionAvail().x;
+        const float window_height = ImGui::GetContentRegionAvail().y;
 
-    Rescale_frambuffer(window_width, window_height);
-    glViewport(0, 0, window_width, window_height);
+        Rescale_frambuffer(window_width, window_height);
+        glViewport(0, 0, window_width, window_height);
 
-    ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImVec2 pos = ImGui::GetCursorScreenPos();
 
-    ImGui::GetWindowDrawList()->AddImage((void*)texture_id, ImVec2(pos.x, pos.y),
-        ImVec2(pos.x + window_width, pos.y + window_height), ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::GetWindowDrawList()->AddImage((void *)texture_id, ImVec2(pos.x, pos.y),
+             ImVec2(pos.x + window_width, pos.y + window_height), ImVec2(0, 1), ImVec2(1, 0));
 
-    ImGui::End();
-    ImGui::PopStyleVar();
-    */
+        ImGui::End();
+        ImGui::PopStyleVar();
+    
 }
 
-void MainScreen::ImGuiWindow(GLFWwindow* window)
+void MainScreen::ImGuiElimentWindow(GLFWwindow* window)
 {
 
     if (show_demo_window)
         ImGui::ShowDemoWindow(&show_demo_window);
 
     float f = 0.0f;
-    
-        ImGui::Begin("Spidex Property Panel");
-        ImGui::Text("Spidex Engine", nullptr);
-        ImGui::Button("Save");
-        ImGui::Checkbox("Demo Window", &show_demo_window);
 
-        ImGui::Text("string");
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-        // Edit a color stored as 4 floats
-        ImGui::ColorEdit4("Color", my_color);
-        ImGui::Spacing();
-        ImGui::DragFloat3("Scale", scale_value, 0.3f, 0.3f, 0.3f);
-        ImGuiIO io = ImGui::GetIO();
-        ImGui::Text("App average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+    ImGui::Begin("Eliments", nullptr); //Window Name
 
+    if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
+    {
+        if (ImGui::BeginTabItem("Scene Eliments"))
+        {
+            // ###########  List Box ##################
+            const char* items[] = { "Cube_01", "Light_01", "Camera" };
+            static int item_current_idx = 0;
+            ImGui::Text("Scean Eliments");
+            if (ImGui::BeginListBox("##Eliments_Listbox", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+            {
+                for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+                {
+                    const bool is_selected = (item_current_idx == n);
+                    if (ImGui::Selectable(items[n], is_selected))
+                        item_current_idx = n;
+                    // set the initial focus on opening the combo
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+
+                }
+                ImGui::EndListBox();
+            }
+            // ###################  End Lisat box ##################    
+
+            ImGui::Text("Spidex Engine", nullptr);
+            ImGui::Button("Save");
+            ImGui::Checkbox("Demo Window", &show_demo_window);
+
+            ImGui::EndTabItem();
+
+        }
+
+        if (ImGui::BeginTabItem("Render"))
+        {
+            ImGui::Text("Spidex Engine Render Settings", nullptr);
+            ImGui::Button("Save Render Settings");
+           
+
+            ImGui::Text("string");
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+            // Edit a color stored as 4 floats
+            ImGui::ColorEdit4("Color", my_color);
+            ImGui::Spacing();
+            ImGui::DragFloat3("Scale", scale_value, 0.3f, 0.3f, 0.3f);
+            ImGuiIO io = ImGui::GetIO();
+            ImGui::Text("App average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
+            ImGui::EndTabItem();
+
+        }
+        if (ImGui::BeginTabItem("Scene Objects"))
+        {
+            ImGui::Text("Spidex Engine Objects", nullptr);
+            
+
+            ImGui::EndTabItem();
+
+        }
         
 
+           
+        ImGui::EndTabBar();
+
+    }
         ImGui::End();
     
     
+}
+void MainScreen::ImGuiPropertiesPanel(GLFWwindow* window)
+{
+    // To Replace demo window
+    // 4 Tabs Properties, Textures Lab, Terraine Lab, Sky Lab
+    ImGui::Begin("Properties", nullptr);
+
+    if (ImGui::BeginTabBar("##Main", ImGuiTabBarFlags_None))
+    {
+        if (ImGui::BeginTabItem("Texture Lab"))
+        {
+            ImGui::Text("ID: Textures");
+            ImGui::Text("Spidex Engine Textures", nullptr);
+           
+
+            // ######################## Show the texture
+            ImGui::SeparatorText("Texture");
+
+            ImVec2 pos = ImGui::GetCursorScreenPos();
+
+            ImGui::GetWindowDrawList()->AddImage((void*)texture_id, ImVec2(pos.x, pos.y),
+            ImVec2(pos.x + 300, pos.y + 300), ImVec2(0, 1), ImVec2(1, 0));
+
+            //#########################
+            ImGui::SeparatorText("Texture");
+            ImGui::Button("Save");
+            ImGui::EndTabItem();
+
+        }
+        if (ImGui::BeginTabItem("Sky Lab"))
+        {
+            ImGui::Text("ID: Sky Lab");
+            ImGui::Text("Spidex Engine New Sky Lab", nullptr);
+            ImGui::Button("Save");
+            
+            ImGui::EndTabItem();
+
+        }
+        if (ImGui::BeginTabItem("Lighting Lab"))
+        {
+            ImGui::Text("ID: Sky Lab");
+            ImGui::Text("Spidex Engine New Light Lab", nullptr);
+            ImGui::Button("Save");
+
+            ImGui::EndTabItem();
+
+        }
+        if (ImGui::BeginTabItem("Terraine Lab"))
+        {
+            ImGui::Text("ID: Sky Lab");
+            ImGui::Text("Spidex Engine New Terrain Lab", nullptr);
+            ImGui::Button("Save");
+
+            ImGui::EndTabItem();
+
+        }
+        
+        
+        ImGui::EndTabBar();
+    }
+
+    ImGui::End();
 }
 void MainScreen::ImGuiMainMenu(GLFWwindow* window)
 {
@@ -222,7 +335,7 @@ void MainScreen::ImGuiMainMenu(GLFWwindow* window)
     ImGui::BeginMainMenuBar();
     if (ImGui::BeginMenu("File"))
     {
-        if (ImGui::MenuItem("Creat Scean"))
+        if (ImGui::MenuItem("New Scean"))
         {
 
         }
@@ -235,7 +348,7 @@ void MainScreen::ImGuiMainMenu(GLFWwindow* window)
         {
 
         }
-        if (ImGui::MenuItem("Creat Scean"))
+        if (ImGui::MenuItem("Save As Scean"))
         {
 
         }
@@ -253,6 +366,64 @@ void MainScreen::ImGuiMainMenu(GLFWwindow* window)
         {
 
         }
+        if (ImGui::MenuItem("Copy"))
+        {
+
+        }
+        if (ImGui::MenuItem("Paste"))
+        {
+
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Wire Frame"))
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        if (ImGui::MenuItem("Wire Frame off"))
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+        ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Objects"))
+    {
+        if (ImGui::MenuItem("Ground Plane"))
+        {
+
+        }
+       
+        if (ImGui::MenuItem("Water Plane"))
+        {
+
+        }
+       
+        if (ImGui::MenuItem("Cube"))
+        {
+
+        }
+        ;
+        if (ImGui::MenuItem("Plane"))
+        {
+
+        }
+        ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Settings"))
+    {
+        if (ImGui::MenuItem("Open Settings"))
+        {
+            // this will open a new panel to select a new sky Texture
+        }
+
+        ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Tools"))
+    {
+        if (ImGui::MenuItem("Open Tool Box"))
+        {
+            // this will open a new panel to select a new Texture
+        }
+
         ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("View"))
@@ -263,9 +434,9 @@ void MainScreen::ImGuiMainMenu(GLFWwindow* window)
         }
         ImGui::EndMenu();
     }
-    if (ImGui::BeginMenu("Docking"))
+    if (ImGui::BeginMenu("Render"))
     {
-        if (ImGui::MenuItem("Dockspace off"))
+        if (ImGui::MenuItem("Testing"))
         {
        
 
@@ -273,9 +444,28 @@ void MainScreen::ImGuiMainMenu(GLFWwindow* window)
         ImGui::EndMenu();
     }
 
-    if (ImGui::BeginMenu("Help"))
+    if (ImGui::BeginMenu("About"))
     {
-        if (ImGui::MenuItem("Hi"))
+        if (ImGui::MenuItem("About Screen"))
+        {
+            show_about_window = true;
+        }
+        
+        if (ImGui::MenuItem("Help"))
+        {
+
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Window Opacity on"))
+        {
+            glfwSetWindowOpacity(window, 0.5f);
+        }
+        if (ImGui::MenuItem("Window Opacity off"))
+        {
+            glfwSetWindowOpacity(window, 1.0f);
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Visit Web Site"))
         {
 
         }
@@ -313,6 +503,83 @@ void MainScreen::ConsolPanel(GLFWwindow* window)
 
 }
 
+void MainScreen::AboutWindow(GLFWwindow* window)
+{
+    if (show_about_window)
+    {
+        ImGui::Begin("About Spidex");
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Spidex Engine");
+        ImGui::SeparatorText(" Info ");
+        ImGui::TextWrapped("Hi I'm The Dyslexic Programmer.I'm not really a programmer, I'm a retired horticulturist."
+            "iv only played with C++ and found it very interesting,"
+            "so now I have lots of time to try and learn this stuff."
+            "my aim is to go from all but zero to making a games engine using Opengl."
+            );
+        ImGui::SeparatorText(" GitHub ");
+        ImGui::Text("https://github.com/Spidex3d/Spidex3d");
+        
+
+        ImGui::Separator();
+        if (ImGui::Button("Close"))
+        {
+            show_about_window = false;
+            //ImGui::End();
+        }
+        ImGui::End();
+    }
+
+}
+
+
+void MainScreen::Creat_FrameBuffer()
+{
+
+    glGenFramebuffers(1, &FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_id, 0);
+
+    glGenRenderbuffers(1, &RBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR FRAMBUFFER:: framebuffer is not compleate!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+}
+
+void MainScreen::Bind_Framebuffer()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+}
+
+void MainScreen::Unbinde_Frambuffer()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void MainScreen::Rescale_frambuffer(float width, float height)
+{
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_id, 0);
+
+
+    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+}
 
 void MainScreen::SetViewPort(GLint x, GLint y, GLsizei width, GLsizei height)
 {
