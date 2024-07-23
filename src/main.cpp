@@ -1,16 +1,14 @@
-#include "pch.h"
-#include "MainScreen.h"
+#include "Header/MainScreen.h"
 #include "../SpdLog/LogInternals.h"
 
 #include "../Shader/Shader.h"
 
 #include "../MeshObjects/Mesh.h"
-#include "Textures.h"
-//#include "../Buffers/Buffers.h"
+#include "Header/Textures.h"
 
-#include "GameInput.h"
+#include "Header/GameInput.h"
 
-// ImGui docking test Sat 13/07/24
+#include "Header\FileManager.h"
 
 
 Shader defaultShader;
@@ -88,6 +86,15 @@ int main(void)
 
     // get the current opengl version number.
     std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
+
+    // ################  Get all jpg files in the directory ########
+    FileManager finder("Textures/skybox", ".jpg");
+    finder.findFiles();
+   
+    std::cout << "We have " << finder.getFileCount() << " files:\n";
+    for (const auto& name : finder.getFileNames()) {
+        std::cout << name << "\n";
+    }
 
     // do the while loop here
     while (!glfwWindowShouldClose(window))

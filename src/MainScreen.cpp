@@ -1,8 +1,8 @@
-#include "MainScreen.h"
+#include "Header/MainScreen.h"
 #include "../SpdLog/LogInternals.h"
 //#include "GameInput.h"
 //include "../MeshObjects/Mesh.h"
-
+//#include "Header/Utility.h"
 
 
 
@@ -181,7 +181,7 @@ void MainScreen::MainScean(GLFWwindow* window)
 
         ImVec2 pos = ImGui::GetCursorScreenPos();
 
-        ImGui::GetWindowDrawList()->AddImage((void *)texture_id, ImVec2(pos.x, pos.y),
+        ImGui::GetWindowDrawList()->AddImage((void *)scean_texture_id, ImVec2(pos.x, pos.y),
              ImVec2(pos.x + window_width, pos.y + window_height), ImVec2(0, 1), ImVec2(1, 0));
 
         ImGui::End();
@@ -221,7 +221,7 @@ void MainScreen::ImGuiElimentWindow(GLFWwindow* window)
                 }
                 ImGui::EndListBox();
             }
-            // ###################  End Lisat box ##################    
+            // ###################  End List box ##################    
 
             ImGui::Text("Spidex Engine", nullptr);
             ImGui::Button("Save");
@@ -230,6 +230,8 @@ void MainScreen::ImGuiElimentWindow(GLFWwindow* window)
             ImGui::EndTabItem();
 
         }
+
+        
 
         if (ImGui::BeginTabItem("Render"))
         {
@@ -279,19 +281,30 @@ void MainScreen::ImGuiPropertiesPanel(GLFWwindow* window)
         {
             ImGui::Text("ID: Textures");
             ImGui::Text("Spidex Engine Textures", nullptr);
-           
+            //ImGui::Text("pointer = %x", texture_image_id);
+            ImGui::Text("Size = %d x %d", tex_image_width, tex_image_height);
+
+            ImGui::Spacing();
+            // ################################# File ###########################
+
+            //Utility::Instance()->getDirectoryFiles();
+            //Utility::Instance()->Initialize();
+            
+                                  
+            // ################################# End File ###########################
+            
+           // I need to loop thought all images in the texture folder
+            int ret = LoadTextureFiles("Textures/github.jpg", &texture_image_id, tex_image_width, tex_image_height);
 
             // ######################## Show the texture
-            ImGui::SeparatorText("Texture");
 
             ImVec2 pos = ImGui::GetCursorScreenPos();
 
-            ImGui::GetWindowDrawList()->AddImage((void*)texture_id, ImVec2(pos.x, pos.y),
-            ImVec2(pos.x + 300, pos.y + 300), ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::GetWindowDrawList()->AddImage((void*)texture_image_id, ImVec2(pos.x, pos.y),
+            ImVec2(pos.x + 100, pos.y + 100), ImVec2(0, 1), ImVec2(1, 0));
 
             //#########################
-            ImGui::SeparatorText("Texture");
-            ImGui::Button("Save");
+            
             ImGui::EndTabItem();
 
         }
@@ -476,29 +489,28 @@ void MainScreen::ImGuiMainMenu(GLFWwindow* window)
 }
 
 
-
-void MainScreen::ConsolPanel(GLFWwindow* window)
+void MainScreen::ConsolPanel(GLFWwindow* window) // ContentBrowserPanel();
 {
-    ImGui::Begin("Output Console");
-        //ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
-        //ImGuiWindowFlags_::ImGuiWindowFlags_NoMove |
-        //ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse);
-    //auto WindowPos = ImVec2(0, SCR_HEIGHT - CONSOLE_PANEL_HEIGHT - 5); // set the height of the consol window
-   
-   
-    //auto WindowSize = ImVec2(SCR_WIDTH, CONSOLE_PANEL_HEIGHT);
-   // auto WindowSize = ImVec2(SCR_WIDTH, CONSOLE_PANEL_HEIGHT);
-
-    //ImGui::SetWindowPos("Output Console", WindowPos);
-    //ImGui::SetWindowSize("Output Console", WindowSize);
+    ImGui::Begin("File Explorer");
+        
     ImGuiIO io = ImGui::GetIO();
     ImGui::Text("App average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
     ImGui::Text("Mouse pos X %.3f Mouse pos Y %.3f", io.MousePos.x, io.MousePos.y);
+    
+    //FileManager::Instance()->Initialize();
 
+
+    ImGui::Columns(5);
+    ImGui::Button("test", {255, 255});
+
+
+    ImGui::NextColumn();
+    ImGui::Columns(1);
     ImGui::End();
     // needs to be resized on window resize
 
+   
 
 
 }
@@ -537,12 +549,12 @@ void MainScreen::Creat_FrameBuffer()
     glGenFramebuffers(1, &FBO);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
-    glGenTextures(1, &texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glGenTextures(1, &scean_texture_id);
+    glBindTexture(GL_TEXTURE_2D, scean_texture_id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_id, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, scean_texture_id, 0);
 
     glGenRenderbuffers(1, &RBO);
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
@@ -555,6 +567,56 @@ void MainScreen::Creat_FrameBuffer()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
+}
+// Loading Textures from a folder
+unsigned int MainScreen::LoadTextureFiles(const char* filename, GLuint* out_texture, int out_width, int out_height)
+{
+    glGenTextures(1, &texture_image_id);
+    glBindTexture(GL_TEXTURE_2D, texture_image_id);
+
+    unsigned char* tex_image_data = stbi_load(filename, &tex_image_width, &tex_image_height, &nrComponents, 4);
+    if (tex_image_data)
+    {
+        GLenum i_format;
+        //GLint i_format;
+        if (nrComponents == 1)
+            i_format = GL_RED;
+        else if (nrComponents == 3) // jpg file
+            i_format = GL_RGB;
+        else if (nrComponents == 4) // png file
+            i_format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, texture_image_id);
+        glTexImage2D(GL_TEXTURE_2D, 0, i_format, tex_image_width, tex_image_height, 0, i_format, GL_UNSIGNED_BYTE, tex_image_data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+       
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+   #if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_image_width, tex_image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_image_data);
+
+        stbi_image_free(tex_image_data);
+
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << filename << std::endl;
+        stbi_image_free(tex_image_data);
+    }
+
+    *out_texture = texture_image_id;
+    out_width = tex_image_width;
+    out_height = tex_image_height;
+
+
+    return texture_image_id;
+
 }
 
 void MainScreen::Bind_Framebuffer()
@@ -569,11 +631,11 @@ void MainScreen::Unbinde_Frambuffer()
 
 void MainScreen::Rescale_frambuffer(float width, float height)
 {
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glBindTexture(GL_TEXTURE_2D, scean_texture_id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_id, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, scean_texture_id, 0);
 
 
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);

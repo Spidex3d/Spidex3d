@@ -139,15 +139,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\FileManager.cpp" />
     <ClCompile Include="Shader\Shader.cpp" />
     <ClCompile Include="SpdLog\LogInternals.cpp" />
     <ClCompile Include="src\MainScreen.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="vendors\imgui\imgui.cpp" />
     <ClCompile Include="vendors\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendors\imgui\imgui_draw.cpp" />
@@ -157,17 +154,16 @@
     <ClCompile Include="vendors\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Buffers\Buffers.h" />
+    <ClInclude Include="src\Header\FileManager.h" />
     <ClInclude Include="MeshObjects\Mesh.h" />
     <ClInclude Include="MeshObjects\Vertices.h" />
     <ClInclude Include="Shader\Shader.h" />
     <ClInclude Include="SpdLog\LogInternals.h" />
-    <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="src\Common.h" />
-    <ClInclude Include="src\GameInput.h" />
-    <ClInclude Include="src\MainScreen.h" />
-    <ClInclude Include="src\pch.h" />
-    <ClInclude Include="src\Textures.h" />
+    <ClInclude Include="src\Header\Camera.h" />
+    <ClInclude Include="src\Header\Common.h" />
+    <ClInclude Include="src\Header\GameInput.h" />
+    <ClInclude Include="src\Header\MainScreen.h" />
+    <ClInclude Include="src\Header\Textures.h" />
     <ClInclude Include="vendors\glad\glad.h" />
     <ClInclude Include="vendors\glad\glad\glad.h" />
     <ClInclude Include="vendors\imgui\imconfig.h" />

@@ -11,7 +11,7 @@
 #include <stb\stb_image.h>
 #include "../Shader/Shader.h"
 
-#include "../src/Common.h"
+#include "../src/Header/Common.h"
 
 #include "../MeshObjects/Vertices.h"
 
