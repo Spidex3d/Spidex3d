@@ -10,6 +10,10 @@ so now I have lots of time to try and learn this stuff.
 my aim is to go from all but zero to making a games engine using Opengl.
 follow along and watch me make a complete fool of myself.
 
+✨ Week 4 Progerss 
+✨ Basic File Manager and ImGui update.
+![image_alt](https://github.com/Spidex3d/Spidex3d/blob/dd73f84727db61fdf48547989d4f82ad0ac52695/Readme/File%20Manager.jpg)
+
 ✨ Week 3 Progerss 
 ✨ ImGui Render in an ImGui Window
 ![image_alt](https://github.com/Spidex3d/Spidex3d/blob/5caa8888b17b8e9a1f135da3d08c73be74208497/Readme/render_Imgui.jpg)
