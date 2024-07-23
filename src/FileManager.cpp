@@ -13,7 +13,6 @@ void FileManager::findFiles()
 
 const std::vector<std::string>& FileManager::getFileNames() const
 {
-	// TODO: insert return statement here
 	return fileName;
 }
 
