@@ -18,7 +18,8 @@
 #include <filesystem> 
 #include "FileManager.h"
 
-#include "Common.h"
+#include "Configs.h"
+
 
 
 class MainScreen
@@ -35,7 +36,7 @@ public:
 	void RenderImGui(GLFWwindow* window);
 	void MainDockSpace(bool* p_open); // docking space
 	void MainScean(GLFWwindow* window); // Drawing to an ImGui Scean Window
-	void ImGuiElimentWindow(GLFWwindow* window);
+	// void ImGuiElimentWindow(GLFWwindow* window);
 	void ImGuiPropertiesPanel(GLFWwindow* window);
 	void ImGuiMainMenu(GLFWwindow* window);
 	void ConsolPanel(GLFWwindow* window); // Content Browser / Explorer
@@ -64,7 +65,8 @@ public:
 
 	void Input();
 	float scale_value[3] = { 0.3f, 0.3f, 0.3f };
-
+	// scale
+	float m = 0.0f;
 
 
 private:
@@ -78,6 +80,8 @@ private:
 	int tex_image_height = 0;
 	int nrComponents = 0;
 	GLuint texture_image_id;
+
+	
 
 	//std::filesystem::path  m_BaseDirectory;
 	//std::filesystem::path  m_CurrentDirectory;

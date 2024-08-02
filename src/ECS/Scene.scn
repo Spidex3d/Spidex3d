@@ -1,0 +1,15 @@
+Scene
+#
+#
+C Name Cube_0
+C ID 1
+C INDEX 0
+C T 1.0, 0.0, 5.0
+C S 1.0, 1.0, 1.0
+#
+#
+C Name Cube_1
+C ID 1
+C INDEX 1
+C T 2.0, 0.0, 4.0
+C S 1.0, 1.0, 1.0

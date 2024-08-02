@@ -1,6 +1,6 @@
 #pragma once
 #include <GLFW\glfw3.h>
-#include "Common.h"
+#include "Configs.h"
 #include "Camera.h"
 
 

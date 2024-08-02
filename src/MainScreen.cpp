@@ -3,6 +3,13 @@
 //#include "GameInput.h"
 //include "../MeshObjects/Mesh.h"
 //#include "Header/Utility.h"
+#include "Header\FileManager.h"
+#include <imgui\ImGuiAF.h>
+//#include <imgui\imgui_internal.h>
+
+
+
+
 
 
 
@@ -47,11 +54,26 @@ void MainScreen::SetImGui(GLFWwindow* window)
     //io.KeyMap[ImGuiKey_H] = GLFW_KEY_HOME;
     ImGui::StyleColorsDark();
     
-    ImGui_ImplOpenGL3_Init("#version 460");
+    ImGui_ImplOpenGL3_Init(SHADER_VERSION);
     ImGui_ImplGlfw_InitForOpenGL(window, true);
+    
     // Set up my own Fonts
-    ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/comic.ttf", 28.0f);
-    ImGui::GetIO().Fonts->Build();
+    //ImGui::GetIO().Fonts->AddFontFromFileTTF(FONT_PATH_MAIN, FONT_SIZE);
+    //ImGui::GetIO().Fonts->Build();
+
+   
+    // Make it possible to use Icons From FontAwesome5
+    ImFontConfig fontconfig;
+    fontconfig.MergeMode = true;
+    fontconfig.PixelSnapH = true;
+    static const ImWchar ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+    
+
+    fontconfig.GlyphOffset = ImVec2(0.0f, 1.0f);
+    io.Fonts->AddFontFromFileTTF(ROBOTO_REG_PATH, FONT_SIZE);
+    io.Fonts->AddFontFromFileTTF(FA_SOLID_PATH, FONT_SIZE, &fontconfig, ranges);
+
+
     
 }
 
@@ -188,9 +210,22 @@ void MainScreen::MainScean(GLFWwindow* window)
         ImGui::PopStyleVar();
     
 }
-
+/*
 void MainScreen::ImGuiElimentWindow(GLFWwindow* window)
 {
+
+   
+
+
+    FileManager finder("Textures/skybox", ".jpg");
+    finder.findFiles();
+
+    //std::cout << "We have " << finder.getFileCount() << " files:\n";
+    
+    for (const auto& name : finder.getFileNames()) {
+
+        //std::cout << name << "\n";
+    }
 
     if (show_demo_window)
         ImGui::ShowDemoWindow(&show_demo_window);
@@ -198,13 +233,21 @@ void MainScreen::ImGuiElimentWindow(GLFWwindow* window)
     float f = 0.0f;
 
     ImGui::Begin("Eliments", nullptr); //Window Name
+    
 
     if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
     {
         if (ImGui::BeginTabItem("Scene Eliments"))
         {
             // ###########  List Box ##################
-            const char* items[] = { "Cube_01", "Light_01", "Camera" };
+
+            
+            
+            const char* itm = "test_1";
+            const char* itm1 = "test_2";
+            const char* itm2 = "test_3";
+
+            const char* items[] = { itm, itm1, itm2 };
             static int item_current_idx = 0;
             ImGui::Text("Scean Eliments");
             if (ImGui::BeginListBox("##Eliments_Listbox", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
@@ -227,10 +270,13 @@ void MainScreen::ImGuiElimentWindow(GLFWwindow* window)
             ImGui::Button("Save");
             ImGui::Checkbox("Demo Window", &show_demo_window);
 
+
+
+
             ImGui::EndTabItem();
 
         }
-
+    
         
 
         if (ImGui::BeginTabItem("Render"))
@@ -267,8 +313,10 @@ void MainScreen::ImGuiElimentWindow(GLFWwindow* window)
     }
         ImGui::End();
     
-    
+        
 }
+*/
+
 void MainScreen::ImGuiPropertiesPanel(GLFWwindow* window)
 {
     // To Replace demo window
@@ -294,14 +342,14 @@ void MainScreen::ImGuiPropertiesPanel(GLFWwindow* window)
             // ################################# End File ###########################
             
            // I need to loop thought all images in the texture folder
-            int ret = LoadTextureFiles("Textures/github.jpg", &texture_image_id, tex_image_width, tex_image_height);
+              //int ret = LoadTextureFiles("Textures/github.jpg", &texture_image_id, tex_image_width, tex_image_height);
 
             // ######################## Show the texture
 
-            ImVec2 pos = ImGui::GetCursorScreenPos();
+              //ImVec2 pos = ImGui::GetCursorScreenPos();
 
-            ImGui::GetWindowDrawList()->AddImage((void*)texture_image_id, ImVec2(pos.x, pos.y),
-            ImVec2(pos.x + 100, pos.y + 100), ImVec2(0, 1), ImVec2(1, 0));
+              //ImGui::GetWindowDrawList()->AddImage((void*)texture_image_id, ImVec2(pos.x, pos.y),
+              //ImVec2(pos.x + 100, pos.y + 100), ImVec2(0, 1), ImVec2(1, 0));
 
             //#########################
             
@@ -677,13 +725,13 @@ void MainScreen::ShutDown()
 
     LogInternals::Instance()->Info("Engine shutdown successfully");
 }
-
+/*
 void MainScreen::BgColour()
 {
     glClearColor(my_color[0], my_color[1], my_color[2], 1.0f);
 
 }
-
+*/
 // get the keyboard and mouse input
 void MainScreen::Input()
 {

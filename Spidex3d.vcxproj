@@ -154,13 +154,15 @@
     <ClCompile Include="vendors\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ECS\ECS.h" />
+    <ClInclude Include="src\ECS\SolidComponents.h" />
     <ClInclude Include="src\Header\FileManager.h" />
     <ClInclude Include="MeshObjects\Mesh.h" />
     <ClInclude Include="MeshObjects\Vertices.h" />
     <ClInclude Include="Shader\Shader.h" />
     <ClInclude Include="SpdLog\LogInternals.h" />
     <ClInclude Include="src\Header\Camera.h" />
-    <ClInclude Include="src\Header\Common.h" />
+    <ClInclude Include="src\Header\Configs.h" />
     <ClInclude Include="src\Header\GameInput.h" />
     <ClInclude Include="src\Header\MainScreen.h" />
     <ClInclude Include="src\Header\Textures.h" />
@@ -168,6 +170,7 @@
     <ClInclude Include="vendors\glad\glad\glad.h" />
     <ClInclude Include="vendors\imgui\imconfig.h" />
     <ClInclude Include="vendors\imgui\imgui.h" />
+    <ClInclude Include="vendors\imgui\ImGuiAF.h" />
     <ClInclude Include="vendors\imgui\imgui_impl_glfw.h" />
     <ClInclude Include="vendors\imgui\imgui_impl_opengl3.h" />
     <ClInclude Include="vendors\imgui\imgui_impl_opengl3_loader.h" />
@@ -178,6 +181,9 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="Fonts\comic.ttf" />
+    <Font Include="Fonts\FA-Regular-400.otf" />
+    <Font Include="Fonts\FA-Solid-900.otf" />
+    <Font Include="Fonts\Roboto-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\shaderFile\default.vert" />
