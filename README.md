@@ -10,6 +10,11 @@ so now I have lots of time to try and learn this stuff.
 my aim is to go from all but zero to making a games engine using Opengl.
 follow along and watch me make a complete fool of myself.
 
+✨ Week 8 Progerss 
+✨ Added a grid and some nice icons
+![image_alt](https://github.com/Spidex3d/Spidex3d/blob/d74c5ae534c53ad8ebc647f1075ca1c0b18920a6/Readme/Grid.jpg)
+
+
 ✨ Week 4 Progerss 
 ✨ Basic File Manager and ImGui update.
 ![image_alt](https://github.com/Spidex3d/Spidex3d/blob/dd73f84727db61fdf48547989d4f82ad0ac52695/Readme/File%20Manager.jpg)
