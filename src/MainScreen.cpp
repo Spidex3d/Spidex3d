@@ -6,6 +6,7 @@
 #include "Header\FileManager.h"
 #include <imgui\ImGuiAF.h>
 //#include <imgui\imgui_internal.h>
+#include <stdio.h>
 
 
 
@@ -210,186 +211,8 @@ void MainScreen::MainScean(GLFWwindow* window)
         ImGui::PopStyleVar();
     
 }
-/*
-void MainScreen::ImGuiElimentWindow(GLFWwindow* window)
-{
-
-   
 
 
-    FileManager finder("Textures/skybox", ".jpg");
-    finder.findFiles();
-
-    //std::cout << "We have " << finder.getFileCount() << " files:\n";
-    
-    for (const auto& name : finder.getFileNames()) {
-
-        //std::cout << name << "\n";
-    }
-
-    if (show_demo_window)
-        ImGui::ShowDemoWindow(&show_demo_window);
-
-    float f = 0.0f;
-
-    ImGui::Begin("Eliments", nullptr); //Window Name
-    
-
-    if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
-    {
-        if (ImGui::BeginTabItem("Scene Eliments"))
-        {
-            // ###########  List Box ##################
-
-            
-            
-            const char* itm = "test_1";
-            const char* itm1 = "test_2";
-            const char* itm2 = "test_3";
-
-            const char* items[] = { itm, itm1, itm2 };
-            static int item_current_idx = 0;
-            ImGui::Text("Scean Eliments");
-            if (ImGui::BeginListBox("##Eliments_Listbox", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
-            {
-                for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-                {
-                    const bool is_selected = (item_current_idx == n);
-                    if (ImGui::Selectable(items[n], is_selected))
-                        item_current_idx = n;
-                    // set the initial focus on opening the combo
-                    if (is_selected)
-                        ImGui::SetItemDefaultFocus();
-
-                }
-                ImGui::EndListBox();
-            }
-            // ###################  End List box ##################    
-
-            ImGui::Text("Spidex Engine", nullptr);
-            ImGui::Button("Save");
-            ImGui::Checkbox("Demo Window", &show_demo_window);
-
-
-
-
-            ImGui::EndTabItem();
-
-        }
-    
-        
-
-        if (ImGui::BeginTabItem("Render"))
-        {
-            ImGui::Text("Spidex Engine Render Settings", nullptr);
-            ImGui::Button("Save Render Settings");
-           
-
-            ImGui::Text("string");
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            // Edit a color stored as 4 floats
-            ImGui::ColorEdit4("Color", my_color);
-            ImGui::Spacing();
-            ImGui::DragFloat3("Scale", scale_value, 0.3f, 0.3f, 0.3f);
-            ImGuiIO io = ImGui::GetIO();
-            ImGui::Text("App average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-
-            ImGui::EndTabItem();
-
-        }
-        if (ImGui::BeginTabItem("Scene Objects"))
-        {
-            ImGui::Text("Spidex Engine Objects", nullptr);
-            
-
-            ImGui::EndTabItem();
-
-        }
-        
-
-           
-        ImGui::EndTabBar();
-
-    }
-        ImGui::End();
-    
-        
-}
-*/
-
-void MainScreen::ImGuiPropertiesPanel(GLFWwindow* window)
-{
-    // To Replace demo window
-    // 4 Tabs Properties, Textures Lab, Terraine Lab, Sky Lab
-    ImGui::Begin("Properties", nullptr);
-
-    if (ImGui::BeginTabBar("##Main", ImGuiTabBarFlags_None))
-    {
-        if (ImGui::BeginTabItem("Texture Lab"))
-        {
-            ImGui::Text("ID: Textures");
-            ImGui::Text("Spidex Engine Textures", nullptr);
-            //ImGui::Text("pointer = %x", texture_image_id);
-            ImGui::Text("Size = %d x %d", tex_image_width, tex_image_height);
-
-            ImGui::Spacing();
-            // ################################# File ###########################
-
-            //Utility::Instance()->getDirectoryFiles();
-            //Utility::Instance()->Initialize();
-            
-                                  
-            // ################################# End File ###########################
-            
-           // I need to loop thought all images in the texture folder
-              //int ret = LoadTextureFiles("Textures/github.jpg", &texture_image_id, tex_image_width, tex_image_height);
-
-            // ######################## Show the texture
-
-              //ImVec2 pos = ImGui::GetCursorScreenPos();
-
-              //ImGui::GetWindowDrawList()->AddImage((void*)texture_image_id, ImVec2(pos.x, pos.y),
-              //ImVec2(pos.x + 100, pos.y + 100), ImVec2(0, 1), ImVec2(1, 0));
-
-            //#########################
-            
-            ImGui::EndTabItem();
-
-        }
-        if (ImGui::BeginTabItem("Sky Lab"))
-        {
-            ImGui::Text("ID: Sky Lab");
-            ImGui::Text("Spidex Engine New Sky Lab", nullptr);
-            ImGui::Button("Save");
-            
-            ImGui::EndTabItem();
-
-        }
-        if (ImGui::BeginTabItem("Lighting Lab"))
-        {
-            ImGui::Text("ID: Sky Lab");
-            ImGui::Text("Spidex Engine New Light Lab", nullptr);
-            ImGui::Button("Save");
-
-            ImGui::EndTabItem();
-
-        }
-        if (ImGui::BeginTabItem("Terraine Lab"))
-        {
-            ImGui::Text("ID: Sky Lab");
-            ImGui::Text("Spidex Engine New Terrain Lab", nullptr);
-            ImGui::Button("Save");
-
-            ImGui::EndTabItem();
-
-        }
-        
-        
-        ImGui::EndTabBar();
-    }
-
-    ImGui::End();
-}
 void MainScreen::ImGuiMainMenu(GLFWwindow* window)
 {
     // This is my main window menu
@@ -405,7 +228,7 @@ void MainScreen::ImGuiMainMenu(GLFWwindow* window)
 
         }
         ImGui::Separator();
-        if (ImGui::MenuItem("Save Scean"))
+        if (ImGui::MenuItem(ICON_FA_SAVE" Save Scean"))
         {
 
         }
@@ -414,7 +237,7 @@ void MainScreen::ImGuiMainMenu(GLFWwindow* window)
 
         }
         ImGui::Separator();
-        if (ImGui::MenuItem("Exit"))
+        if (ImGui::MenuItem(ICON_FA_SIGN_OUT_ALT" Exit"))
         {
             glfwSetWindowShouldClose(window, true);
         }

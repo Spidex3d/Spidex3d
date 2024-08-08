@@ -154,6 +154,7 @@
     <ClCompile Include="vendors\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Grid\Grid.h" />
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\ECS\SolidComponents.h" />
     <ClInclude Include="src\Header\FileManager.h" />
@@ -188,6 +189,8 @@
   <ItemGroup>
     <None Include="Shader\shaderFile\default.vert" />
     <None Include="Shader\shaderFile\default.frag" />
+    <None Include="Shader\shaderFile\default_Grid.frag" />
+    <None Include="Shader\shaderFile\default_Grid.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Temp\TestOpenGL\Textures\crate.jpg" />

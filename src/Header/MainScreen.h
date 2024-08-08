@@ -37,7 +37,7 @@ public:
 	void MainDockSpace(bool* p_open); // docking space
 	void MainScean(GLFWwindow* window); // Drawing to an ImGui Scean Window
 	// void ImGuiElimentWindow(GLFWwindow* window);
-	void ImGuiPropertiesPanel(GLFWwindow* window);
+	//void ImGuiPropertiesPanel(GLFWwindow* window);
 	void ImGuiMainMenu(GLFWwindow* window);
 	void ConsolPanel(GLFWwindow* window); // Content Browser / Explorer
 	void AboutWindow(GLFWwindow* window); //About Window from the main menu

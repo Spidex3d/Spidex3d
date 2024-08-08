@@ -12,12 +12,15 @@
 
 #include "ECS\SolidComponents.h"
 
+#include "../Grid/Grid.h"
+
 
 
 Shader defaultShader;
+Shader defaultGridShader;
 
-unsigned int defaultMap;
-unsigned int floorMap;
+unsigned int defaultMap; // cube map
+unsigned int floorMap;  // floor map
 
 
 
@@ -67,6 +70,7 @@ int main(void)
     //########################
     //Shader defaultShader;
      defaultShader.Load("Shader/shaderFile/default.vert", "Shader/shaderFile/default.frag");
+     defaultGridShader.Load("Shader/shaderFile/default_Grid.vert", "Shader/shaderFile/default_Grid.frag");
 
     
      //Mesh_Setup(); // Load the VBO Data
@@ -101,8 +105,28 @@ int main(void)
     SolidComponents::Instance()->defaultCube();
     SolidComponents::Instance()->defaultCube();
     SolidComponents::Instance()->defaultCube();
-    
 
+    // ################################################## grid ########################
+
+    const auto FILL = 20; // 20 x 20 Grid do something with this at runtime
+    float SIZE = 1.0f;
+    
+    //std::vector<float> gridVertices = createGridVertices(1.0f, 20);
+    std::vector<float> gridVertices = createGridVertices(SIZE, FILL);
+    
+    glGenVertexArrays(1, &GridVAO);
+    glGenBuffers(1, &GridVBO);
+
+    glBindVertexArray(GridVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, GridVBO);
+    glBufferData(GL_ARRAY_BUFFER, gridVertices.size() * sizeof(float), gridVertices.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    
+    
+    // ################################################## grid End ########################
+    
     // do the while loop here
     while (!glfwWindowShouldClose(window))
     {
@@ -127,17 +151,15 @@ int main(void)
 
         bool doc = true;
         MainScreen::Instance()->MainDockSpace(&doc); // Docking
-
         MainScreen::Instance()->MainScean(window); // This is the ImGui Scene Window which we are drawing are cube in
-
         MainScreen::Instance()->ImGuiMainMenu(window);//2 Main Window Menu
-        MainScreen::Instance()->ImGuiPropertiesPanel(window); // New Prop Panel right of screen
         MainScreen::Instance()->ConsolPanel(window); // 3
-        //MainScreen::Instance()->ImGuiElimentWindow(window);  // 4 Eliments Panel left 
+        //MainScreen::Instance()->ImGuiElimentWindow(window);  
         MainScreen::Instance()->AboutWindow(window); // About Window
 
         // ############### ECS ######################
-        SolidComponents::Instance()->GuiEntityPanel(window);
+        SolidComponents::Instance()->GuiEntityPanel(window); //  Eliments Panel left 
+        SolidComponents::Instance()->ImGuiPropertiesPanel(window);  // New Prop Panel right of screen
         
         MainScreen::Instance()->Bind_Framebuffer();  // Bind the new Frambuffer
         
@@ -145,9 +167,6 @@ int main(void)
 
         // MainScreen::Instance()->BgColour();
         SolidComponents::Instance()->BgColour();
-
-
-
 
         defaultShader.Use();
        
@@ -172,7 +191,7 @@ int main(void)
         MainScreen::Instance()->ClearScreen();
         
 
-        defaultShader.Use();
+       // defaultShader.Use();
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, defaultMap);
@@ -181,7 +200,22 @@ int main(void)
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
+        //###################################### Grid Start ###############################
+        defaultGridShader.Use();
+        defaultGridShader.SendUniformData("projection", projection);
+        defaultGridShader.SendUniformData("view", view);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -0.5f, 2.1f));
+        model = glm::scale(model, glm::vec3(20.0f, 0.0f, 20.0f));
+        defaultGridShader.SendUniformData("model", model);
+
+        glBindVertexArray(GridVAO);
+        glDrawArrays(GL_LINES, 0, gridVertices.size());
+        glBindVertexArray(0);
+        //###################################### Grid End ###############################
+
         //#################################### FLOOR #################################
+        /*
         defaultShader.Use();
         defaultShader.SendUniformData("projection", projection);
         defaultShader.SendUniformData("view", view);
@@ -196,9 +230,9 @@ int main(void)
         glBindVertexArray(planeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
-
+        
         //################################## END FLOOR ##############################
-            
+          */  
        
         
         MainScreen::Instance()->Unbinde_Frambuffer();
