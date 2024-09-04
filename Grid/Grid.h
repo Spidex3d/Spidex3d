@@ -1,4 +1,6 @@
 #pragma once
+#include <glad\glad.h>
+#include <GLFW\glfw3.h>
 #include <vector>
 
 GLuint GridVAO, GridVBO;
@@ -31,5 +33,27 @@ std::vector<float> createGridVertices(float size, int divisions) {
     }
     return vertices;
 }
+/*
+// ################################################## grid ########################
+const auto FILL = fill; // 20 x 20 Grid do something with this at runtime
+float SIZE = 1.0f;
+class test {
+public:
+    void gridSetUp() {
+        //std::vector<float> gridVertices = createGridVertices(1.0f, 20);
+        std::vector<float> gridVertices = createGridVertices(SIZE, FILL);
 
-/**/
+        glGenVertexArrays(1, &GridVAO);
+        glGenBuffers(1, &GridVBO);
+
+        glBindVertexArray(GridVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, GridVBO);
+        glBufferData(GL_ARRAY_BUFFER, gridVertices.size() * sizeof(float), gridVertices.data(), GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+    }
+};
+// ################################################## grid End ########################
+
+*/

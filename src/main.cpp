@@ -11,8 +11,11 @@
 #include "Header\FileManager.h"
 
 #include "ECS\SolidComponents.h"
+#include "ECS\EntityNode.h"
 
 #include "../Grid/Grid.h"
+
+#include <vector>
 
 
 
@@ -102,13 +105,15 @@ int main(void)
     // need to creat a scean manager class to sort this lot out
     SolidComponents::Instance()->defaultPlane();
     SolidComponents::Instance()->defaultCube();
-    SolidComponents::Instance()->defaultCube();
-    SolidComponents::Instance()->defaultCube();
-    SolidComponents::Instance()->defaultCube();
+    
+   // SolidComponents::Instance()->defaultCube();
+   // SolidComponents::Instance()->defaultCube();
+   // SolidComponents::Instance()->defaultCube();
 
+    
+    
     // ################################################## grid ########################
-
-    const auto FILL = 20; // 20 x 20 Grid do something with this at runtime
+    const auto FILL = fill; // 20 x 20 Grid do something with this at runtime
     float SIZE = 1.0f;
     
     //std::vector<float> gridVertices = createGridVertices(1.0f, 20);
@@ -126,6 +131,14 @@ int main(void)
     
     
     // ################################################## grid End ########################
+    
+    std::vector<Data1> myVector;
+    //Node* head = nullptr;
+    int currentIndex = 0;
+    int indexCube = 0;
+    int indexPlane = 0;
+    int indexSphere = 0;
+    int EntityID = 0; // Example EntityID
     
     // do the while loop here
     while (!glfwWindowShouldClose(window))
@@ -157,12 +170,15 @@ int main(void)
         //MainScreen::Instance()->ImGuiElimentWindow(window);  
         MainScreen::Instance()->AboutWindow(window); // About Window
 
-        // ############### ECS ######################
+        // ############### Object manegment system ######################
         SolidComponents::Instance()->GuiEntityPanel(window); //  Eliments Panel left 
-        SolidComponents::Instance()->ImGuiPropertiesPanel(window);  // New Prop Panel right of screen
+       
+        
+
+        EntityNode::Instance()->renderPropertiesPanel();
+        EntityNode::Instance()->renderUI(myVector, currentIndex, indexCube, indexPlane, indexSphere, EntityID);
         
         MainScreen::Instance()->Bind_Framebuffer();  // Bind the new Frambuffer
-        
         //############################# End ImGui #############################################
 
         // MainScreen::Instance()->BgColour();
@@ -170,6 +186,8 @@ int main(void)
 
         defaultShader.Use();
        
+       // SolidComponents::Instance()->InitializeCamera();
+        
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.3f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
         //view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
@@ -177,21 +195,21 @@ int main(void)
         defaultShader.SendUniformData("view", view);
         glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         defaultShader.SendUniformData("model", model);
-
         
-
+        MainScreen::Instance()->ClearScreen();
+        
+        
         defaultShader.SendUniformData("projection", projection);
         defaultShader.SendUniformData("view", view);
         model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        model = glm::translate(model,glm::vec3(0.0f, 0.5f, 0.0f)); // cubePositions[0]);
-        //model = glm::scale(model, glm::vec3(scale_value[0], scale_value[1], scale_value[2]));
-        model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(1.0f, 0.3f, 0.5f));
+        model = glm::translate(model,glm::vec3(pos_val[0], pos_val[1], pos_val[2])); // cubePositions[0]);
+        //model = glm::translate(model,glm::vec3(0.0f, 0.5f, 0.0f)); // cubePositions[0]);
+        model = glm::scale(model, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
+        //model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(1.0f, 0.3f, 0.5f));
+        //model = glm::rotate(model, glm::radians(45.0f), glm::vec3(rot_val[0], rot_val[1], rot_val[2]));
+       
         defaultShader.SendUniformData("model", model);
 
-        MainScreen::Instance()->ClearScreen();
-        
-
-       // defaultShader.Use();
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, defaultMap);
@@ -200,7 +218,31 @@ int main(void)
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
+            // click a button to add a new cube index 1
+        if (shouldAddCube) {
+            // ################################ add cube 2 ##########################
+
+            model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+            model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.0f)); // cubePositions[0]);
+            model = glm::scale(model, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
+            model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(0.0f, 0.3f, 0.0f));
+
+            defaultShader.SendUniformData("model", model);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, floorMap);
+
+            glBindVertexArray(VAO);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glBindVertexArray(0);         
+            /*
+           */
+        }
+
+        
+            
         //###################################### Grid Start ###############################
+
         defaultGridShader.Use();
         defaultGridShader.SendUniformData("projection", projection);
         defaultGridShader.SendUniformData("view", view);
@@ -212,6 +254,7 @@ int main(void)
         glBindVertexArray(GridVAO);
         glDrawArrays(GL_LINES, 0, gridVertices.size());
         glBindVertexArray(0);
+        
         //###################################### Grid End ###############################
 
         //#################################### FLOOR #################################
@@ -243,6 +286,8 @@ int main(void)
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        
 
     }
 

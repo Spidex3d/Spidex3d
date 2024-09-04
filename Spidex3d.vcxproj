@@ -156,7 +156,9 @@
   <ItemGroup>
     <ClInclude Include="Grid\Grid.h" />
     <ClInclude Include="src\ECS\ECS.h" />
+    <ClInclude Include="src\ECS\EntityNode.h" />
     <ClInclude Include="src\ECS\SolidComponents.h" />
+    <ClInclude Include="src\Header\Buttons.h" />
     <ClInclude Include="src\Header\FileManager.h" />
     <ClInclude Include="MeshObjects\Mesh.h" />
     <ClInclude Include="MeshObjects\Vertices.h" />
