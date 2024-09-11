@@ -4,6 +4,25 @@
 #include <iostream>
 #include <vector>
 
+struct Cube1 {
+    glm::vec3 position;
+    glm::mat4 model;
+    glm::vec3 scale;
+    int cubeIndex;
+
+};
+
+int cubeIndexTM = -1;
+bool shouldMoveCube = false;
+bool shouldDeleteCube = false;
+
+bool rotateCube = false;
+
+
+std::vector<Cube1> mycubes; // Add a cube with a button click
+
+
+
 struct Light {
     std::string name;
     int LightId;
@@ -32,7 +51,6 @@ struct Data1 {
 
 };
 
-//Data1* selectedData = nullptr;
 
 class EntityNode {
 public:
@@ -40,6 +58,16 @@ public:
         static EntityNode* component = new EntityNode;
 
         return component;
+    }
+
+    void SelectObject(std::vector<Data1>& myVector, Data1* selectedData, int& currentIndex) {
+        
+        // get the selected object information
+        std::string test = selectedData->value;
+        int test1 = selectedData->index;
+
+        std::cout << "Selected an object: " << test << " : " << test1 << std::endl;
+            
     }
 
 
@@ -114,7 +142,7 @@ public:
         }
         // ICON_FA_DICE_D6
         ImGui::Begin(ICON_FA_OBJECT_GROUP" Dynamic Spidex Object Management system");
-
+        ImGui::Checkbox("Rotate Cube", &rotateCube); // make the cube rotate
         if (ImGui::Button("Add Cube    ")) {
             ObjectTypeID = 6;
             myVector.push_back({ currentIndex++, ICON_FA_CUBE" DefaultCube_", indexCube++, ObjectTypeID });
@@ -149,7 +177,9 @@ public:
 
                 if (ImGui::IsItemClicked()) {
                     selectedData = &data;
-                    std::cout << " you did it " << std::endl;
+                    shouldMoveCube = true; // set the move cube
+                    cubeIndexTM = data.objectIdx; // The index of the cube you want to move
+                    std::cout << " you did it " << data.objectIdx << std::endl;
 
                 }
 
@@ -186,6 +216,8 @@ public:
                         if (ImGui::Selectable(ICON_FA_TRASH_ALT " Delete")) {
                             selectedData = &data;
                             deleteObject(myVector, selectedData, currentIndex, indexCube, indexPlane, indexSphere);
+                            cubeIndexTM = data.objectIdx; // The index of the cube you want to Delete
+                            shouldDeleteCube = true;
                         }
 
                         ImGui::EndPopup();
@@ -263,7 +295,7 @@ public:
                // ###################################################
                 static ImGuiTableFlags flags = ImGuiTableFlags_Reorderable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders;
 
-                static bool selected;
+                //static bool selected;
 
 
                 if (ImGui::CollapsingHeader(ICON_FA_INFO" Object info", ImGuiTreeNodeFlags_DefaultOpen))
@@ -335,7 +367,7 @@ public:
                     ImGui::SameLine();
                     ImGui::DragFloat3("##Scale", scale_val, 1.0f, 1.0f, 1.0f);
 
-                    ImGui::Selectable(label, &selected);
+                   // ImGui::Selectable(label, &selected);
 
                     ImGui::EndTable();
 
@@ -392,6 +424,7 @@ private:
     bool sunLightAdded = false;
     Light sunLightMain = { ICON_FA_SUN " World Sun", 1 };
 
+
     bool LightAdded = false;
     Light LightMain = { ICON_FA_SUN " Light", 1 };
 
@@ -431,7 +464,7 @@ private:
 
         }
 
-        // this is the little buttons on the entity node!
+        
     }
 
 

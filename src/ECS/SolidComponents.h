@@ -57,8 +57,7 @@ public:
         PlaneIndex = PlaneIndex;
         TransformComponent trans;
         ScaleComponent scale;
-        //Mesh_Setup(); // temp in here
-        FloorMesh();  // temp in here
+       
 
         
         
@@ -82,7 +81,7 @@ public:
 
     //inline int defaultCube() { 
     int defaultCube() { 
-        Mesh_Setup(); // setup the cube info
+       // Mesh_Setup(); // setup the cube info
         d_CubeId = d_CubeId; // if its id = 1 its a cube
         cubeIndex = cubeIndex;
         TransformComponent trans;

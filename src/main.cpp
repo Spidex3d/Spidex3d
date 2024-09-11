@@ -5,6 +5,7 @@
 
 #include "../MeshObjects/Mesh.h"
 #include "Header/Textures.h"
+#include "../Objects/DefaultCube.h"
 
 #include "Header/GameInput.h"
 
@@ -24,7 +25,36 @@ Shader defaultGridShader;
 
 unsigned int defaultMap; // cube map
 unsigned int floorMap;  // floor map
+unsigned int crateMap;    // crate
 
+GLuint vao;
+GLuint vbo;
+GLuint ebo;
+
+// update cube position
+void updateCubePosition(int index, glm::vec3 newPosition) {
+    if (index >= 0 && index < mycubes.size()) {
+        mycubes[index].position = newPosition;
+
+        // Update the model matrix
+        mycubes[index].model = glm::mat4(1.0f);
+        mycubes[index].model = glm::translate(mycubes[index].model, mycubes[index].position);
+        mycubes[index].model = glm::scale(mycubes[index].model, mycubes[index].scale);
+    }
+    else {
+        std::cout << "Invalid cube index" << std::endl;
+    }
+}
+// delete a selected cube
+void deleteCube(int index) {
+    if (index >= 0 && index < mycubes.size()) {
+        mycubes.erase(mycubes.begin() + index);
+        std::cout << "Cube at index " << index << " deleted." << std::endl;
+    }
+    else {
+        std::cout << "Invalid cube index" << std::endl;
+    }
+}
 
 
 int main(void)
@@ -76,7 +106,8 @@ int main(void)
      defaultGridShader.Load("Shader/shaderFile/default_Grid.vert", "Shader/shaderFile/default_Grid.frag");
 
     
-     //Mesh_Setup(); // Load the VBO Data
+     defaultCube newCube; // new  green cube class ################### GO TO LINE 412 ##############################
+     defaultCube::Instance()->MaindefaultCube();
 
 
     // flip image
@@ -87,10 +118,13 @@ int main(void)
     std::string texPath = "Textures/";
     std::string texImg = "github.jpg";
     std::string floorImg = "black-limestone_s.jpg";
+    std::string crateImg = "crate.jpg";
 
     defaultMap = loadTexture((texPath + texImg).c_str());
     //################ floor Map ########################
     floorMap = loadTexture((texPath + floorImg).c_str());
+    //################# Crate Map #######################
+    crateMap = loadTexture((texPath + crateImg).c_str());
    
 
     glEnable(GL_DEPTH_TEST);
@@ -129,7 +163,6 @@ int main(void)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     
-    
     // ################################################## grid End ########################
     
     std::vector<Data1> myVector;
@@ -140,6 +173,7 @@ int main(void)
     int indexSphere = 0;
     int EntityID = 0; // Example EntityID
     
+    float posy = 2.0f;
     // do the while loop here
     while (!glfwWindowShouldClose(window))
     {
@@ -174,7 +208,6 @@ int main(void)
         SolidComponents::Instance()->GuiEntityPanel(window); //  Eliments Panel left 
        
         
-
         EntityNode::Instance()->renderPropertiesPanel();
         EntityNode::Instance()->renderUI(myVector, currentIndex, indexCube, indexPlane, indexSphere, EntityID);
         
@@ -184,10 +217,8 @@ int main(void)
         // MainScreen::Instance()->BgColour();
         SolidComponents::Instance()->BgColour();
 
+        // ##################################### Camera Control ############################
         defaultShader.Use();
-       
-       // SolidComponents::Instance()->InitializeCamera();
-        
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.3f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
         //view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
@@ -198,6 +229,7 @@ int main(void)
         
         MainScreen::Instance()->ClearScreen();
         
+        // ##################################### Default Cube ############################
         
         defaultShader.SendUniformData("projection", projection);
         defaultShader.SendUniformData("view", view);
@@ -205,8 +237,10 @@ int main(void)
         model = glm::translate(model,glm::vec3(pos_val[0], pos_val[1], pos_val[2])); // cubePositions[0]);
         //model = glm::translate(model,glm::vec3(0.0f, 0.5f, 0.0f)); // cubePositions[0]);
         model = glm::scale(model, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
-        //model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(1.0f, 0.3f, 0.5f));
-        //model = glm::rotate(model, glm::radians(45.0f), glm::vec3(rot_val[0], rot_val[1], rot_val[2]));
+        if (rotateCube) {
+            model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(0.0f, 0.3f, 0.0f));
+            // model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
+        }
        
         defaultShader.SendUniformData("model", model);
 
@@ -214,30 +248,145 @@ int main(void)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, defaultMap);
 
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
+        defaultCube::Instance()->draw();
+
 
             // click a button to add a new cube index 1
-        if (shouldAddCube) {
-            // ################################ add cube 2 ##########################
+        //if (shouldAddCube) {
+        //    // ################################ add cube 2 ##########################
 
-            model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-            model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.0f)); // cubePositions[0]);
+        //    model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        //    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.0f)); // cubePositions[0]);
+        //    model = glm::scale(model, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
+        //    model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(0.0f, 0.3f, 0.0f));
+
+        //    defaultShader.SendUniformData("model", model);
+
+        //    glActiveTexture(GL_TEXTURE0);
+        //    glBindTexture(GL_TEXTURE_2D, floorMap);
+
+        //    glBindVertexArray(VAO);
+        //    glDrawArrays(GL_TRIANGLES, 0, 36);
+        //    glBindVertexArray(0);         
+        //   
+        //}
+
+        //###################################### Render 10 multiple cubes Start ###############################
+
+        for (int idxCube = 0; idxCube < 10; ++idxCube) {
+            // this loops 10 times
+
+            //defaultTestShader.Use();
+            defaultShader.Use();
+            defaultShader.SendUniformData("projection", projection);
+            defaultShader.SendUniformData("view", view);
+
+            glm::mat4 model = glm::mat4(1.0f);
+
+            if (idxCube < 10) {
+                model = glm::translate(model, glm::vec3(idxCube * 2.0f, 0.0f, 0.0f));
+            }
+
             model = glm::scale(model, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
-            model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(0.0f, 0.3f, 0.0f));
 
             defaultShader.SendUniformData("model", model);
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, floorMap);
 
-            glBindVertexArray(VAO);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-            glBindVertexArray(0);         
-            /*
-           */
+            defaultCube::Instance()->draw();
+
         }
+        
+        //###################################### Render A New cubes on button click ###############################           
+
+        if (shouldAddCube) {
+            cubeIndex = mycubes.size(); // Use the size of the vector to determine the next index
+
+            Cube1 newCube; // Assuming Cube is a struct or class with position, scale, and model members
+
+            // Set position and scale based on cubeIndex
+            switch (cubeIndex) {
+            case 0:
+                newCube.position = glm::vec3(0.0f, 0.0f, -3.0f);
+                newCube.scale = glm::vec3(0.5f, 0.5f, 0.5f);
+                break;
+            case 1:
+                newCube.position = glm::vec3(-4.0f, 0.5f, 0.0f);
+                newCube.scale = glm::vec3(2.0f, 2.0f, 2.0f);
+                break;
+            case 2:
+                newCube.position = glm::vec3(-6.0f, 0.0f, 0.0f);
+                newCube.scale = glm::vec3(1.0f, 1.0f, 1.0f); // Default scale
+                break;
+            case 3:
+                newCube.position = glm::vec3(-5.0f, 0.0f, 3.0f);
+                newCube.scale = glm::vec3(1.0f, 1.0f, 1.0f); // Default scale
+                break;
+            default: // cube No5
+
+                newCube.position = glm::vec3(0.0f, posy, 0.0f); // Default position for any additional cubes
+                newCube.scale = glm::vec3(0.5f, 0.5f, 0.5f); // Default scale
+                posy += 1.0;
+                break;
+            }
+
+            // Initialize model matrix
+            newCube.model = glm::mat4(1.0f);
+            newCube.model = glm::translate(newCube.model, newCube.position);
+            newCube.model = glm::scale(newCube.model, newCube.scale);
+
+            // Add the new cube to the vector
+            mycubes.push_back(newCube);
+
+            shouldAddCube = false;
+
+            std::cout << "Cube Index " << cubeIndex << std::endl;
+        }
+
+        // Update positions and models for all cubes
+        for (auto& cube : mycubes) {
+
+            cube.model = glm::mat4(1.0f); // Reset to identity matrix
+            cube.model = glm::translate(cube.model, cube.position); // Apply new translation
+            cube.model = glm::scale(cube.model, cube.scale);
+        }
+
+        // Update cube position if needed
+        if (shouldMoveCube) {
+            //int cubeIndexToMove = cubeIndexTM; // The index of the cube you want to move
+            if (cubeIndexTM != -1) {
+                //glm::vec3 newCubePosition = glm::vec3(5.0f, 2.0f, 3.0f); // The new position for the cube
+                glm::vec3 newCubePosition = glm::vec3(pos_val[0], pos_val[1], pos_val[2]); // The new position for the cube
+                //glm::vec3(pos_val[0], pos_val[1], pos_val[2]
+                updateCubePosition(cubeIndexTM, newCubePosition);
+                std::cout << " you picked cube: " << cubeIndexTM << std::endl;
+
+                shouldMoveCube = false; // Reset the flag
+            }
+        }
+
+        if (shouldDeleteCube) {
+            if (cubeIndexTM != -1) { // Check if a valid index is set
+                deleteCube(cubeIndexTM);
+                cubeIndexTM = -1; // Reset the index
+                shouldDeleteCube = false; // Reset the flag
+            }
+        }
+
+        // Render all cubes
+        for (auto& cube : mycubes) {
+            defaultShader.Use();
+            defaultShader.SendUniformData("projection", projection);
+            defaultShader.SendUniformData("view", view);
+            defaultShader.SendUniformData("model", cube.model);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, crateMap);
+            defaultCube::Instance()->draw();
+        }
+
+        //######################### End Draw new cube on button click #############################
 
         
             
@@ -291,14 +440,14 @@ int main(void)
 
     }
 
-    Mesh_CleanUp();
+    //Mesh_CleanUp();
 
     // close it all down and go to bed.
     // it includes the Imgui stuff
     MainScreen::Instance()->ShutDown();
     
-    glDeleteVertexArrays(1, &planeVAO);
-    glDeleteVertexArrays(1, &VAO);
+    //glDeleteVertexArrays(1, &planeVAO);
+    //glDeleteVertexArrays(1, &VAO);
     //glDeleteFramebuffers(1, &FBO);
     //glDeleteTextures(1, &texture_id);
    // glDeleteRenderbuffers(1, &RBO);
