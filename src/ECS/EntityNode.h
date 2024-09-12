@@ -72,12 +72,52 @@ public:
 
 
     void renderNameEditor(Data1* selectedData, bool& showNameEditor) {
-        ImGui::Begin("Name Editor", &showNameEditor);
+        ImGui::Begin("Object Editor", &showNameEditor);
 
         if (selectedData) {
             ImGui::InputText("Object Name", nameBuffer, IM_ARRAYSIZE(nameBuffer));
-            if (ImGui::Button("Update Name")) {
+            // ##################
+            ImGui::BeginTable("Test Table", 1, ImGuiTableFlags_Reorderable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders);
+
+            ImGui::TableNextColumn();
+            ImGui::Text("Position:  ");
+            ImGui::SameLine();
+            if (ImGui::Button("Reset")) {
+                pos_val[0] = 0.0f, pos_val[1] = 0.0f, pos_val[2] = 2.0f;
+            }// Reset to 0,0,0
+            ImGui::SameLine();
+            ImGui::DragFloat3("##pos", pos_val, 1.0f, 1.0f, 2.0f);
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::Text("Rotation:  ");
+            ImGui::SameLine();
+            if (ImGui::Button("Reset")) {
+                rot_val[0] = 0.0f, rot_val[1] = 0.0f, rot_val[2] = 0.0f;
+            }
+            ImGui::SameLine();
+            ImGui::DragFloat3("##Rot", rot_val, 1.0f, 1.0f, 1.0f);
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::Text("Scale:       ");
+            ImGui::SameLine();
+            if (ImGui::Button("SReset")) {
+                scale_val[0] = 1.0f, scale_val[1] = 1.0f, scale_val[2] = 1.0f;
+            }// 1,1,1
+            ImGui::SameLine();
+            ImGui::DragFloat3("##Scale", scale_val, 0.0f, 0.0f, 0.0f);
+
+            //ImGui::Selectable(label, &selected);
+
+            ImGui::EndTable();
+
+
+            // ##################
+            if (ImGui::Button("Update Object")) {
+
                 selectedData->value = nameBuffer;
+                shouldMoveCube = true; // set the move cube
+                cubeIndexTM = selectedData->objectIdx; // The index of the cube you want to move
                 showNameEditor = false;
             }
         }
@@ -177,8 +217,8 @@ public:
 
                 if (ImGui::IsItemClicked()) {
                     selectedData = &data;
-                    shouldMoveCube = true; // set the move cube
-                    cubeIndexTM = data.objectIdx; // The index of the cube you want to move
+                    //shouldMoveCube = true; // set the move cube
+                    //cubeIndexTM = data.objectIdx; // The index of the cube you want to move
                     std::cout << " you did it " << data.objectIdx << std::endl;
 
                 }

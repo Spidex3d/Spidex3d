@@ -3,7 +3,6 @@
 
 #include "../Shader/Shader.h"
 
-#include "../MeshObjects/Mesh.h"
 #include "Header/Textures.h"
 #include "../Objects/DefaultCube.h"
 
@@ -32,9 +31,9 @@ GLuint vbo;
 GLuint ebo;
 
 // update cube position
-void updateCubePosition(int index, glm::vec3 newPosition) {
+void updateCubePosition(int index, glm::vec3 newPosition, glm::vec3 newScale) {
     if (index >= 0 && index < mycubes.size()) {
-        mycubes[index].position = newPosition;
+        mycubes[index].position = newPosition, mycubes[index].scale = newScale;
 
         // Update the model matrix
         mycubes[index].model = glm::mat4(1.0f);
@@ -234,9 +233,10 @@ int main(void)
         defaultShader.SendUniformData("projection", projection);
         defaultShader.SendUniformData("view", view);
         model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        model = glm::translate(model,glm::vec3(pos_val[0], pos_val[1], pos_val[2])); // cubePositions[0]);
-        //model = glm::translate(model,glm::vec3(0.0f, 0.5f, 0.0f)); // cubePositions[0]);
-        model = glm::scale(model, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 1.0f)); // cubePositions[0]);
+        // if (selected) do this
+        //model = glm::scale(model, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
         if (rotateCube) {
             model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(0.0f, 0.3f, 0.0f));
             // model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
@@ -287,7 +287,7 @@ int main(void)
                 model = glm::translate(model, glm::vec3(idxCube * 2.0f, 0.0f, 0.0f));
             }
 
-            model = glm::scale(model, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
+            model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
             defaultShader.SendUniformData("model", model);
 
@@ -309,7 +309,7 @@ int main(void)
             switch (cubeIndex) {
             case 0:
                 newCube.position = glm::vec3(0.0f, 0.0f, -3.0f);
-                newCube.scale = glm::vec3(0.5f, 0.5f, 0.5f);
+                newCube.scale = glm::vec3(2.0f, 2.0f, 2.0f);
                 break;
             case 1:
                 newCube.position = glm::vec3(-4.0f, 0.5f, 0.0f);
@@ -317,11 +317,11 @@ int main(void)
                 break;
             case 2:
                 newCube.position = glm::vec3(-6.0f, 0.0f, 0.0f);
-                newCube.scale = glm::vec3(1.0f, 1.0f, 1.0f); // Default scale
+                newCube.scale = glm::vec3(2.0f, 2.0f, 2.0f); // Default scale
                 break;
             case 3:
                 newCube.position = glm::vec3(-5.0f, 0.0f, 3.0f);
-                newCube.scale = glm::vec3(1.0f, 1.0f, 1.0f); // Default scale
+                newCube.scale = glm::vec3(2.0f, 2.0f, 2.0f); // Default scale
                 break;
             default: // cube No5
 
@@ -358,8 +358,9 @@ int main(void)
             if (cubeIndexTM != -1) {
                 //glm::vec3 newCubePosition = glm::vec3(5.0f, 2.0f, 3.0f); // The new position for the cube
                 glm::vec3 newCubePosition = glm::vec3(pos_val[0], pos_val[1], pos_val[2]); // The new position for the cube
-                //glm::vec3(pos_val[0], pos_val[1], pos_val[2]
-                updateCubePosition(cubeIndexTM, newCubePosition);
+                glm::vec3 newCubeScale = glm::vec3(scale_val[0], scale_val[1], scale_val[2]);
+                //updateCubePosition(cubeIndexTM, newCubePosition);
+                updateCubePosition(cubeIndexTM, newCubePosition, newCubeScale);
                 std::cout << " you picked cube: " << cubeIndexTM << std::endl;
 
                 shouldMoveCube = false; // Reset the flag
@@ -396,7 +397,7 @@ int main(void)
         defaultGridShader.SendUniformData("projection", projection);
         defaultGridShader.SendUniformData("view", view);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -0.5f, 2.1f));
+        model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));
         model = glm::scale(model, glm::vec3(20.0f, 0.0f, 20.0f));
         defaultGridShader.SendUniformData("model", model);
 
@@ -446,11 +447,5 @@ int main(void)
     // it includes the Imgui stuff
     MainScreen::Instance()->ShutDown();
     
-    //glDeleteVertexArrays(1, &planeVAO);
-    //glDeleteVertexArrays(1, &VAO);
-    //glDeleteFramebuffers(1, &FBO);
-    //glDeleteTextures(1, &texture_id);
-   // glDeleteRenderbuffers(1, &RBO);
-
     return 0;
 }

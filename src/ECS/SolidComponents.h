@@ -11,7 +11,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "../MeshObjects/Mesh.h"
+//#include "../MeshObjects/Mesh.h"
 #include "../Shader/Shader.h"
 #include "../Header/Camera.h"
 
