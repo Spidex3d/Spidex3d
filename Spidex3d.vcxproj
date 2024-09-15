@@ -146,6 +146,7 @@
     <ClCompile Include="src\MainScreen.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Windows\spxWindows.cpp" />
     <ClCompile Include="vendors\imgui\imgui.cpp" />
     <ClCompile Include="vendors\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendors\imgui\imgui_draw.cpp" />
@@ -157,8 +158,11 @@
   <ItemGroup>
     <ClInclude Include="Objects\DefaultCube.h" />
     <ClInclude Include="Grid\Grid.h" />
+    <ClInclude Include="SkyBox\skyBox.h" />
+    <ClInclude Include="SkyBox\skyMesh.h" />
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\ECS\EntityNode.h" />
+    <ClInclude Include="src\ECS\ObjectSelection.h" />
     <ClInclude Include="src\ECS\SolidComponents.h" />
     <ClInclude Include="src\Header\Buttons.h" />
     <ClInclude Include="src\Header\FileManager.h" />
@@ -169,6 +173,7 @@
     <ClInclude Include="src\Header\GameInput.h" />
     <ClInclude Include="src\Header\MainScreen.h" />
     <ClInclude Include="src\Header\Textures.h" />
+    <ClInclude Include="src\Windows\spxWindows.h" />
     <ClInclude Include="vendors\glad\glad.h" />
     <ClInclude Include="vendors\glad\glad\glad.h" />
     <ClInclude Include="vendors\imgui\imconfig.h" />
@@ -193,6 +198,10 @@
     <None Include="Shader\shaderFile\default.frag" />
     <None Include="Shader\shaderFile\default_Grid.frag" />
     <None Include="Shader\shaderFile\default_Grid.vert" />
+    <None Include="Shader\shaderFile\sky.frag" />
+    <None Include="Shader\shaderFile\sky.vert" />
+    <None Include="Shader\shaderFile\test.frag" />
+    <None Include="Shader\shaderFile\test.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Temp\TestOpenGL\Textures\crate.jpg" />

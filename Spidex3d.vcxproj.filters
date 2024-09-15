@@ -57,6 +57,9 @@
     <ClCompile Include="Objects\DefaultCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Windows\spxWindows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vendors\glad\glad\glad.h">
@@ -137,6 +140,18 @@
     <ClInclude Include="Objects\DefaultCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Windows\spxWindows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBox\skyMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBox\skyBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECS\ObjectSelection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="Fonts\comic.ttf" />
@@ -149,6 +164,10 @@
     <None Include="Shader\shaderFile\default.vert" />
     <None Include="Shader\shaderFile\default_Grid.vert" />
     <None Include="Shader\shaderFile\default_Grid.frag" />
+    <None Include="Shader\shaderFile\sky.frag" />
+    <None Include="Shader\shaderFile\sky.vert" />
+    <None Include="Shader\shaderFile\test.vert" />
+    <None Include="Shader\shaderFile\test.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\crate.jpg">
