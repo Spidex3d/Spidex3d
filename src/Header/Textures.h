@@ -6,21 +6,22 @@
 #include <iostream>
 
 
-unsigned int loadTexture(const std::string& filePath)
-//unsigned int loadTexture(char const* path)
-
+unsigned int loadTexture(const std::string& filePath) // use this one
 {
+
+
+
     unsigned int textureID;
 
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
-    //unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
-    unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &nrComponents, 0);
+    
+    unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &nrComponents, 0); // use this one
     if (data)
     {
         GLenum i_format;
-        //GLint i_format;
+       
         if (nrComponents == 1)
             i_format = GL_RED;
         else if (nrComponents == 3) // jpg file

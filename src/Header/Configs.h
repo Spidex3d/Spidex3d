@@ -10,6 +10,8 @@
 const int SCR_WIDTH = 1920;
 const int SCR_HEIGHT = 1080;
 
+
+
 enum FontIndex : int {
 	REG_FONT_INDEX = 0,
 	SMALL_FONT_INDEX,

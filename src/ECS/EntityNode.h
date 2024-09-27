@@ -5,6 +5,7 @@
 #include <string>
 #include <Windows.h>
 #include <commdlg.h>
+#include <filesystem>
 #include <locale>
 #include <codecvt>
 #include <vector>
@@ -12,6 +13,7 @@
 
 #include "../Windows/spxWindows.h"
 #include "../Header/Textures.h"
+#include "../SkyBox/skyBox.h"
 
 
 struct Cube1 {
@@ -32,14 +34,27 @@ bool shouldDeleteObject = false;
 extern GLuint myTexture = 0;
 extern unsigned int crateMap = 0;
 
+bool gridNogrid = false;   // Show the grid or hide it
+
 bool rotateCube = false;
+
+bool shouldAddCube = false;
+
+bool addSky = false;
+
+float amb_light[3] = {
+    1.0f, 1.0f, 1.0f
+};
 
 
 std::vector<Cube1> mycubes; // Add a cube with a button click
 
-struct Light {
+
+
+struct LightData {
     std::string name;
     int LightId;
+    int LightType;
 };
 
     struct Camera1 {
@@ -63,10 +78,18 @@ struct Light {
         int ObjectTypeID;       
 
     };
-    
-    
+    //std::vector<LightData> myLights;
+    std::vector<LightData> myLights = {
+            {"Light1", 1},
+            {"Light2", 2},
+            // Add more lights as needed
+    };
 
     Data1* selectedData = nullptr;
+    Camera1* selectedCamData = nullptr;
+    LightData* selectedLightData = nullptr;
+
+    namespace fs = std::filesystem;
 
     class EntityNode {
     public:
@@ -75,6 +98,17 @@ struct Light {
 
             return component;
         }
+        // get the sky folders
+        std::vector<std::string> getDirectories(const std::string& path) {
+            std::vector<std::string> directories;
+            for (const auto& entry : fs::directory_iterator(path)) {
+                if (entry.is_directory()) {
+                    directories.push_back(entry.path().filename().string());
+                }
+            }
+            return directories;
+        }
+
         // chang this name renderObjectEditor  renderNameEditor
         void renderObjectEditor(Data1* selectedData, bool& showObjectEditor) {
             ImGui::Begin("Object Editor", &showObjectEditor);
@@ -159,9 +193,6 @@ struct Light {
             ImGui::End();
         }
 
-
-        
-
         void cloneSelectedItem(std::vector<Data1>& myVector, Data1* selectedData, int& currentIndex) {
             if (selectedData) {
                 Data1 clonedItem = *selectedData;
@@ -190,30 +221,11 @@ struct Light {
             
         }
 
-
-
-
+       
 
         void renderUI(std::vector<Data1>& myVector, int& currentIndex,
             int& indexCube, int& indexPlane, int& indexSphere, int ObjectTypeID) {
             
-            if (!cameraAdded) { // Default Camera
-                ObjectTypeID = 1;
-                myVector.push_back({ currentIndex++, defaultCamera.name, 0, ObjectTypeID }); // EntityID = 4
-                cameraAdded = true;
-            }
-            if (!sunLightAdded) {
-                ObjectTypeID = 2;
-                myVector.push_back({ currentIndex++, sunLightMain.name, 0, ObjectTypeID });
-                    sunLightAdded = true;
-
-            }
-            if (!LightAdded) {
-                ObjectTypeID = 3;
-                myVector.push_back({ currentIndex++, LightMain.name, 0, ObjectTypeID });
-                LightAdded = true;
-
-            }
             // ICON_FA_DICE_D6
             ImGui::Begin(ICON_FA_OBJECT_GROUP" Dynamic Spidex Object Management system");
             ImGui::Checkbox("Rotate Cube", &rotateCube); // make the cube rotate
@@ -235,7 +247,6 @@ struct Light {
                 ObjectTypeID = 8;
                 myVector.push_back({ currentIndex++, "DefaultSphere_", indexSphere++, ObjectTypeID });
             }
-
 
             ImGui::SeparatorText(ICON_FA_SPIDER" Scene Tree");
 
@@ -265,7 +276,6 @@ struct Light {
                 if (nodeOpen) {
                     this->onRightClick();
                     
-
                     if (ImGui::IsItemHovered()) {
                         
                         this->nodeButtons();
@@ -309,11 +319,50 @@ struct Light {
             ImGui::TreePop();
             }
 
-
-            
-
             if (showObjectEditor) {
                 renderObjectEditor(selectedData, showObjectEditor); // Render the name editor window
+            }
+
+            ImGui::End();
+        }
+        // ######################################### Camera #####################################
+        void renderCameraUI(std::vector<Camera1>& myCamera, std::string &name, int &camId)
+        {
+
+            ImGui::Begin(ICON_FA_VIDEO" Camera");
+            // cameras types perspective, top down left, right, first person ie; player
+
+            if (!cameraAdded) { // Default Camera
+                camId = 1;
+                myCamera.push_back({ name, camId }); // EntityID = 4
+                cameraAdded = true;
+            }
+            auto flags = ROOT_SELECTED_FLAGS;
+            if (ImGui::TreeNodeEx(ICON_FA_STREET_VIEW" Spidex Camera", flags))
+            {
+
+                /*if (is_selected)
+                    node_flags |= ImGuiTreeNodeFlags_Selected;*/
+
+                for (auto& data : myCamera) {
+                    ImGuiTreeNodeFlags nodeFlags = flags | (selectedCamData == &data ? ImGuiTreeNodeFlags_Selected : 0);
+                    bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)data.camId, nodeFlags,
+                        " Camera: %s : %d ",
+                        data.name.c_str(), data.camId);
+
+                    if (ImGui::IsItemClicked()) {
+                        selectedCamData = &data;
+                        //objectUpdateIndex = data.objectIdx;
+                        //objectUpdateIndex = selectedData->objectIdx;
+                       // cubeIndex = data.objectIdx; // get the index of the cube selected
+                        //shouldMoveCube = true; // set the move cube
+                        //cubeIndexTM = data.objectIdx; // The index of the cube you want to move
+                        //std::cout << " you did it " << data.objectIdx << std::endl;
+                    }
+                    ImGui::TreePop();
+                    
+                }
+                ImGui::TreePop();
             }
 
             ImGui::End();
@@ -339,8 +388,6 @@ struct Light {
                     else {
                         ImGui::Text("No data selected");
                     }
-
-
 
                     ImGui::Text("ID: Textures");
                     ImGui::Text("Spidex Engine Textures", nullptr);
@@ -407,9 +454,7 @@ struct Light {
 
                         if (ImGui::Checkbox("##test", &test)) {
                             // do somthing
-
                         }
-
 
                         ImGui::EndTable();
                         
@@ -452,27 +497,197 @@ struct Light {
                         ImGui::EndTable();
 
                     }
+                    ImGui::Checkbox("Hide Grid", &gridNogrid); // make the cube rotate
 
                     ImGui::EndChild();
 
                     ImGui::EndTabItem();
 
+
                 }
                 if (ImGui::BeginTabItem("Sky Lab"))
                 {
-                    ImGui::Text("ID: Sky Lab");
-                    ImGui::Text("Spidex Engine New Sky Lab", nullptr);
-                    ImGui::Button("Save");
+                    /*std::string path = "Textures/skybox";
+
+                    std::vector<std::string> directories = getDirectories(path);
+
+                    std::cout << "Directories in " << path << ":\n";
+                    for (const auto& dir : directories) {
+                        std::cout << dir << std::endl;
+                    }*/
+
+
+
+                    ImGui::Text("ID: Sky Lab"); // ###################  Sky Lab ##############
+
+                    // add a selection of skys to pick from maybe a folder or an image showing the type sky
+                    ImGui::Columns(3);
+
+                    
+                    
+                        ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset());// BlueSky
+                        if (ImGui::ImageButton((void*)(intptr_t)texture1, ImVec2(135, 135))) {
+                            // some sort of SkyID to set a different sky
+                            selectedSkyboxIndex = 0;
+                            skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
+                            if (!addSky) {
+                                addSky = true;
+                            }
+                        }
+                                
+                        ImGui::NextColumn();
+                        ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset()); // BlueSky_2
+                        if (ImGui::ImageButton((void*)(intptr_t)texture2, ImVec2(135, 135))) {
+                            selectedSkyboxIndex = 1;
+                            skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
+                            if (!addSky) {
+                                addSky = true;
+                            }
+                        }
+                        ImGui::NextColumn();
+                        ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset()); // DarkSky
+                        if (ImGui::ImageButton((void*)(intptr_t)texture3, ImVec2(135, 135))) {
+                            selectedSkyboxIndex = 2;
+                            skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
+                            addSky = true;
+                        }
+                        
+                  
+                    
+                    ImGui::Columns(1); // Reset columns
+                    ImGui::Separator(); // Optional: Add a separator line
+                    ImGui::Columns(3); // Start new set of columns
+
+                    ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset()); //RedSky
+                    if (ImGui::ImageButton((void*)(intptr_t)texture4, ImVec2(135, 135))) {
+                        // some sort of SkyID to set a different sky
+                        selectedSkyboxIndex = 3;
+                        skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
+                        if (!addSky) {
+                            addSky = true;
+                        }
+                    }
+
+                    ImGui::NextColumn();
+                    ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset()); //MistySky
+                    if (ImGui::ImageButton((void*)(intptr_t)texture5, ImVec2(135, 135))) {
+                        selectedSkyboxIndex = 4;
+                        skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
+                        if (!addSky) {
+                            addSky = true;
+                        }
+                    }
+                    ImGui::NextColumn();
+                    ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset()); //MistyBlue
+                    if (ImGui::ImageButton((void*)(intptr_t)texture6, ImVec2(135, 135))) {
+                        selectedSkyboxIndex = 5;
+                        skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
+                        addSky = true;
+                    }
+                    ImGui::Columns(1); // Reset columns
+                    ImGui::Separator(); // Optional: Add a separator line
+                    ImGui::Columns(3); // Start new set of columns
+
+                    ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset()); //GreenSky
+                    if (ImGui::ImageButton((void*)(intptr_t)texture7, ImVec2(135, 135))) {
+                        // some sort of SkyID to set a different sky
+                        selectedSkyboxIndex = 6;
+                        skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
+                        if (!addSky) {
+                            addSky = true;
+                        }
+                    }
+
+                    ImGui::NextColumn();
+                    ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset()); //NightSky
+                    if (ImGui::ImageButton((void*)(intptr_t)texture8, ImVec2(135, 135))) {
+                        selectedSkyboxIndex = 7;
+                        skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
+                        if (!addSky) {
+                            addSky = true;
+                        }
+                    }
+                    ImGui::NextColumn();
+                    ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset()); //SifiSky
+                    if (ImGui::ImageButton((void*)(intptr_t)texture9, ImVec2(135, 135))) {
+                        selectedSkyboxIndex = 8;
+                        skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
+                        addSky = true;
+                    }
+                    /*for (int i = 0; i < 3; ++i) {
+                        ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset());
+                        if (ImGui::ImageButton((void*)(intptr_t)crateMap, ImVec2(135, 135))) {
+                            addSky = true;
+                        }
+                        ImGui::NextColumn();
+                    }*/
+                    
+                    ImGui::EndColumns();
+
+
+                    ImGui::Text("Spidex Engine New Sky Lab! well its a start", nullptr);
+                    
+                    if (ImGui::Button("Add a Sky   ")) {
+                        selectedSkyboxIndex = 2;
+                        skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
+                        addSky = true;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Remove a Sky")) {
+                        addSky = false;
+                    }
+                    
 
                     ImGui::EndTabItem();
 
                 }
+                
                 if (ImGui::BeginTabItem("Lighting Lab"))
                 {
-                    ImGui::Text("ID: Sky Lab");
+                    
+                    ImGui::Text("ID: Light Lab");
                     ImGui::Text("Spidex Engine New Light Lab", nullptr);
                     ImGui::Button("Save");
 
+                    
+                    ImGui::SeparatorText(ICON_FA_SPIDER" Light Settings");
+
+                    if (ImGui::TreeNodeEx(ICON_FA_STREET_VIEW" Spidex Lights"))
+                    {
+
+                        static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow |
+                            ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+                        static bool align_label_with_current_x_position = false;
+                        static bool test_drag_and_drop = false;
+
+                        if (align_label_with_current_x_position)
+                            ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
+
+                        static int selection_mask = (1 << 2);
+                        int node_clicked = -1;
+
+                        for (auto& data : myLights) {
+                            ImGuiTreeNodeFlags nodeFlags = base_flags | (selectedLightData == &data ? ImGuiTreeNodeFlags_Selected : 0);
+                            bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)data.LightId, nodeFlags,
+                                " Camera: %s : %d : %d ",
+                                data.name.c_str(), data.LightId, data.LightType);
+
+                            if (ImGui::IsItemClicked()) {
+                                selectedLightData = &data;
+                                // Handle selection logic here
+                            }
+
+                            if (nodeOpen) {
+                                // Add child nodes or additional information here if needed
+                                ImGui::TreePop();
+                            }
+                        }
+
+                        ImGui::TreePop();
+                    }
+                    ImGui::Text("Change light color");
+                    ImGui::ColorEdit4("Color", amb_light);
+                   
                     ImGui::EndTabItem();
 
                 }
@@ -495,18 +710,17 @@ struct Light {
        
 
     private:
-       // Data1* selectedData = nullptr;
-        
+       // Data1* selectedData = nullptr;      
 
         bool showObjectEditor = false;
         bool cameraAdded = false;
         Camera1 defaultCamera = { ICON_FA_VIDEO " MainCamera ", 0 };// maincamera with id 0
         
         bool sunLightAdded = false;
-        Light sunLightMain = { ICON_FA_SUN " World Sun", 1 };
+       // Lights sunLightMain = { ICON_FA_SUN " World Sun", 1, 1 };
 
         bool LightAdded = false;
-        Light LightMain = { ICON_FA_SUN " Light", 1 };
+        LightData LightMain = { ICON_FA_SUN " Light", 1, 2 };
 
         char nameBuffer[128] = "";
        // Data1* selectedData = nullptr;
@@ -517,11 +731,18 @@ struct Light {
                 ImGui::OpenPopup("NodePopup");
             }      
         }
-        /*void IsHovered() {
-            if (ImGui::IsItemHovered()) {
-                this->nodeButtons();
-            }
-        }*/
+
+        int selectedSkyboxIndex = 0;
+
+        GLuint texture1 = loadTexture("Textures/skybox/BlueSky/front.jpg");
+        GLuint texture2 = loadTexture("Textures/skybox/BlueSky_2/front.jpg");
+        GLuint texture3 = loadTexture("Textures/skybox/DarkSky/back.jpg");
+        GLuint texture4 = loadTexture("Textures/skybox/RedSky/front.jpg");
+        GLuint texture5 = loadTexture("Textures/skybox/MistySky/front.jpg");
+        GLuint texture6 = loadTexture("Textures/skybox/MistyBlueSky/front.jpg");
+        GLuint texture7 = loadTexture("Textures/skybox/GreenSky/front.jpg");
+        GLuint texture8 = loadTexture("Textures/skybox/NightSky/front.jpg");
+        GLuint texture9 = loadTexture("Textures/skybox/SifiSky/front.jpg");
 
         // ################################### Will come back to this ####################
         SPIDEX_INLINE void nodeButtons() {

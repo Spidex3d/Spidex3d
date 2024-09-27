@@ -11,7 +11,7 @@
 
 #include "ECS\SolidComponents.h"
 #include "ECS\EntityNode.h"
-//#include "ECS\ObjectSelection.h"
+#include "../Objects/spxObjLoader.h"
 
 #include "../Grid/Grid.h"
 #include "../Objects/DefaultCube.h" // new class
@@ -23,17 +23,24 @@
 #include <vector>
 #include <string>
 
+//#include "App.h"
+
 unsigned int loadTexture(const std::string& filePath);
 
 //int fill = 20; // use this to change how many squares in the grid
 
-    Shader defaultShader;
-    Shader defaultGridShader;
-    Shader defaultTestShader;
-    Shader skyShader;
+    //Shader defaultShader;
+    //Shader defaultGridShader;
+    //Shader defaultTestShader;
+    //Shader skyShader;
 
     unsigned int defaultMap; // cube map spidex
     unsigned int floorMap;  // floor map
+
+    // #################  Lights ######
+    glm::vec3 lightPos(1.2f, 1.5f, 2.0f);
+
+    unsigned int lightMap;
     //unsigned int crateMap;    // crate
 
     GLuint vao;
@@ -74,6 +81,10 @@ unsigned int loadTexture(const std::string& filePath);
         glm::vec3 scale;
 
     }; 
+
+   
+   
+
 
     
     int main(void)
@@ -121,11 +132,14 @@ unsigned int loadTexture(const std::string& filePath);
 
         //################################ Load Shader Files #######################################
         //Shader defaultShader;
-        defaultShader.Load("Shader/shaderFile/default.vert", "Shader/shaderFile/default.frag");
-        defaultGridShader.Load("Shader/shaderFile/default_Grid.vert", "Shader/shaderFile/default_Grid.frag");
-        defaultTestShader.Load("Shader/shaderFile/test.vert", "Shader/shaderFile/test.frag");
+        //defaultShader.Load("Shader/shaderFile/default.vert", "Shader/shaderFile/default.frag");
+        Shader defaultShader("Shader/shaderFile/default.vert", "Shader/shaderFile/default.frag");
+        Shader defaultGridShader("Shader/shaderFile/default_Grid.vert", "Shader/shaderFile/default_Grid.frag");
+        
+        Shader LightBulbShader("Shader/shaderFile/bulb.vert", "Shader/shaderFile/bulb.frag");
+        Shader LightCubeShader("Shader/shaderFile/light.vert", "Shader/shaderFile/light.frag");
 
-        skyShader.Load("Shader/shaderFile/sky.vert", "Shader/shaderFile/sky.frag");
+        Shader skyShader("Shader/shaderFile/sky.vert", "Shader/shaderFile/sky.frag");
         
        // flip image
         stbi_set_flip_vertically_on_load(true);
@@ -145,7 +159,52 @@ unsigned int loadTexture(const std::string& filePath);
         crateMap = loadTexture((texPath + crateImg).c_str());
         std::string myTexturePath;
 
+        //                       ############ OBJ loder ########     
+
+        const int numModels = 5;
+        spxObjLoader mesh[numModels];
+        unsigned int texture[numModels];
+
+        // Load models
+        mesh[0].loadOBJ("Object_loader/models/woodcrate.obj");
+        mesh[1].loadOBJ("Object_loader/models/robot.obj");
+        mesh[2].loadOBJ("Object_loader/models/floor.obj");
+        mesh[3].loadOBJ("Object_loader/models/bunny.obj");
+        mesh[4].loadOBJ("Object_loader/models/bowling_pin.obj");
+
+        // Load textures
+        texture[0] = loadTexture("Object_loader/models/woodcrate_diffuse.jpg");
+        texture[1] = loadTexture("Object_loader/models/robot_diffuse.jpg");
+        texture[2] = loadTexture("Object_loader/models/tile_floor.jpg");
+        texture[3] = loadTexture("Object_loader/models/bunny_diffuse.jpg");
+        //texture[4] = loadTexture("Object_loader/models/AMF.tga"); // bowling pin tga big file
+        texture[4] = loadTexture("Object_loader/models/Pin.jpg");  // bowling pin jpg small file
         
+
+        spxObjLoader lightMesh;
+        lightMesh.loadOBJ("Object_loader/models/light.obj");
+        //############################## Assimp Test #####################################
+
+        //Assimp::Importer imp;
+
+        //############################## End Assimp Test #####################################
+
+        glm::vec3 modPos[] = {
+            glm::vec3(-4.5f, 0.5f, 1.0f), // wooden crate
+            glm::vec3(-2.0f, -0.5f, -3.0f),  // robot
+            glm::vec3(0.0f, -0.5f, 0.0f), // floor
+            glm::vec3(-7.0f, -0.5f, 2.0f), // bunny
+            glm::vec3(3.0f, -0.5f, 2.0f)  // bowling pin
+
+        };
+        glm::vec3 modScale[] = {
+            glm::vec3(1.0f, 1.0f, 1.0f), // wooden crate
+            glm::vec3(1.0f, 1.0f, 1.0f), // robot
+            glm::vec3(20.0f, 0.5f, 20.0f), // floor
+            glm::vec3(0.7f, 0.7f, 0.7f), // bunny
+            glm::vec3(0.1f, 0.1f, 0.1f)  // bowling pin
+
+        };
 
 
         glEnable(GL_DEPTH_TEST);
@@ -160,35 +219,14 @@ unsigned int loadTexture(const std::string& filePath);
         // get the current opengl version number.
         //std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
 
-        // ################ Testing my ECS Stuff ##########################################
-
+      
         defaultCube newCube; // new  green cube class ################### GO TO LINE 412 ##############################
         defaultCube::Instance()->MaindefaultCube();
 
-        //SolidComponents::Instance()->defaultCube();   // draw the spidex cube
-        // Mesh_Setup(); // Load the VBO Data
-
-
-        // ################################################## grid ########################
-        const auto FILL = fill; // 20 x 20 Grid do something with this at runtime
-        float SIZE = 1.0f;
-
-        //std::vector<float> gridVertices = createGridVertices(1.0f, 20);
-        std::vector<float> gridVertices = createGridVertices(SIZE, FILL);
-
-        glGenVertexArrays(1, &GridVAO);
-        glGenBuffers(1, &GridVBO);
-
-        glBindVertexArray(GridVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, GridVBO);
-        glBufferData(GL_ARRAY_BUFFER, gridVertices.size() * sizeof(float), gridVertices.data(), GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        // ################################################## grid End ########################
-
-
+        
+        std::vector<Camera1> myCamera;
+        std::string name;
+        int camId = 0;
            
 
         std::vector<Data1> myVector;
@@ -202,6 +240,13 @@ unsigned int loadTexture(const std::string& filePath);
         float posy = 2.0f;
 
         SkyBox();
+        Grid::Instance()->gridSetUp();
+
+        float angel = 0.0f;  // to do with the light
+
+        ////Grid::Instance()->gridSetUp();
+        //App* app = App::Instance();
+        //app->appInIt();
 
     // do the while loop here
         while (!glfwWindowShouldClose(window))
@@ -236,42 +281,75 @@ unsigned int loadTexture(const std::string& filePath);
             // ############### ECS ######################
             //SolidComponents::Instance()->GuiEntityPanel(window); //  Eliments Panel left 
             
-            MainScreen::Instance()->Bind_Framebuffer();  // Bind the new Frambuffer
+            MainScreen::Instance()->Bind_Framebuffer();  // Bind the new Frambuffer to draw the main screen
 
-            // ######################################## Render UI Vector or Linked List!!! ##################################
-             // THIS IS THE NEW BIT Vector or Linked List!!! #############
+            // ######################################## Render UI Vector  ##################################
+             //################################### THIS IS THE NEW BIT Vector #############
             EntityNode::Instance()->renderPropertiesPanel();
             EntityNode::Instance()->renderUI(myVector, currentIndex, indexCube, indexPlane, indexSphere, EntityID);
-
-            // ######################################## END Render UI  ########################################################
-            // Object Selection
-            //ObjectSelection::Instance()->ObjSelection();
-            //ObjectSelection::Instance()->TestTexture();
-          
+            EntityNode::Instance()->renderCameraUI(myCamera, name, camId);
            
+            // ######################################## END Render UI  ########################################################          
 
             //############################# End ImGui #############################################
 
             // MainScreen::Instance()->BgColour();
             SolidComponents::Instance()->BgColour();
 
+            // ############################### Lighting ###############################
 
-            defaultShader.Use();
+            LightCubeShader.Use();
+            LightCubeShader.setVec3("light.position", lightPos);
+            LightCubeShader.setVec3("viewPos", camera.Position);
+            LightCubeShader.setVec3("light.ambient", 1.8f, 1.8f, 1.8f);
+            LightCubeShader.setVec3("light.diffuse", 1.5f, 1.5f, 1.5f);
+            LightCubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+            LightCubeShader.setVec3("matirial.specular", 0.5f, 0.5f, 0.5f);
+            LightCubeShader.setFloat("matirial.shininess", 60.0f);
+
+            glm::vec3 viewPos;
+            
+            glm::vec3 lightPos(0.0f, 1.0f, 6.0f);
+          //  glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+            glm::vec3 lightColor(amb_light[0], amb_light[1], amb_light[2]);
+
+            angel += (float)deltaTime * 50.0f;
+            lightPos.x = 4.0f * sinf(glm::radians(angel));
+
+            
+
+
+
+
+
             // ###################################### Camera Control ########################################
 
             glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.2f, 100.0f);
             glm::mat4 view = camera.GetViewMatrix();
             //view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
-            defaultShader.SendUniformData("projection", projection);
-            defaultShader.SendUniformData("view", view);
+            //defaultShader.SendUniformData("projection", projection);
+            //defaultShader.setMat4("projection", projection);
+            LightCubeShader.setMat4("projection", projection);
+            
+            //defaultShader.SendUniformData("view", view);
+            LightCubeShader.setMat4("view", view);
+            //defaultShader.setMat4("view", view);
             glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-            defaultShader.SendUniformData("model", model);
+            LightCubeShader.setMat4("model", model);
+            //defaultShader.setMat4("model", model);
 
             MainScreen::Instance()->ClearScreen();
 
+            
+            
+
+           
+
             // ######################################### Default Cube #######################################
-            defaultShader.SendUniformData("projection", projection);
-            defaultShader.SendUniformData("view", view);
+            LightCubeShader.Use();
+            LightCubeShader.setMat4("projection", projection);
+            LightCubeShader.setMat4("view", view);
             model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
             //model = glm::translate(model, glm::vec3(pos_val[0], pos_val[1], pos_val[2])); // cubePositions[0]);
             model = glm::translate(model,glm::vec3(0.0f, 0.0f, 1.0f)); // cubePositions[0]);
@@ -284,42 +362,55 @@ unsigned int loadTexture(const std::string& filePath);
             }
             //model = glm::rotate(model, glm::radians(45.0f), glm::vec3(rot_val[0], rot_val[1], rot_val[2]));
 
-            defaultShader.SendUniformData("model", model);
+            LightCubeShader.setMat4("model", model);
 
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, defaultMap);
+            
 
             defaultCube::Instance()->draw();
 
             // ######################################### END Default Cube #######################################
-            // click a button to add a new cube index 1
-            //if (shouldAddCube) {
-            //    // ################################ Test add cube 2 the rotating one ##########################
+            
+            LightCubeShader.Use();
+            LightCubeShader.setMat4("view", view);
+            LightCubeShader.setMat4("projection", projection);
+            LightCubeShader.setVec3("viewPos", viewPos);
+            LightCubeShader.setVec3("lightColor", lightColor);
+            LightCubeShader.setVec3("lightPos", lightPos);
 
-                //model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-                //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.0f)); // cubePositions[0]);
-                //model = glm::scale(model, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
-                //model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(0.0f, 0.3f, 0.0f));
+            //             ################### draw obj mesh ###################
+            for (int i = 0; i < numModels; i++)
+            {
+                model = glm::translate(glm::mat4(1.0f), modPos[i]) * glm::scale(glm::mat4(1.0f), modScale[i]);
+                LightCubeShader.setMat4("model", model);
+                glBindTexture(GL_TEXTURE_2D, texture[i]);
+                mesh[i].objDraw();
+                glBindTexture(texture[i], 0);
+            }
+            
+                
 
-                //defaultShader.SendUniformData("model", model);
-
-                //glActiveTexture(GL_TEXTURE0);
-                //glBindTexture(GL_TEXTURE_2D, floorMap);
-
-                //glBindVertexArray(VAO);
-                //glDrawArrays(GL_TRIANGLES, 0, 36);
-                //glBindVertexArray(0);
-            //}
-
+             //                           ### Light OBJ ######   
+                
+                model = glm::translate(model = glm::mat4(1.0f), lightPos);
+                LightBulbShader.Use();
+                //LightBulbShader.setVec3("lightColor", lightColor);
+                LightBulbShader.setVec3("lightColor", amb_light[0], amb_light[1], amb_light[2]);
+                LightBulbShader.setMat4("model", model);
+                LightBulbShader.setMat4("view", view);
+                LightBulbShader.setMat4("projection", projection);
+                lightMesh.objDraw();
+            
             //###################################### Test Render 10 multiple cubes Start ###############################
 
             for (int idxCube = 0; idxCube < 10; ++idxCube) {
                 // this loops 10 times
 
-                defaultShader.Use();
-                defaultShader.SendUniformData("projection", projection);
-                defaultShader.SendUniformData("view", view);
+                LightCubeShader.Use();
+                LightCubeShader.setMat4("projection", projection);
+                LightCubeShader.setMat4("view", view);
 
                 glm::mat4 model = glm::mat4(1.0f);
 
@@ -335,7 +426,7 @@ unsigned int loadTexture(const std::string& filePath);
                 else {
                     model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
                 }
-                defaultShader.SendUniformData("model", model);
+                LightCubeShader.setMat4("model", model);
 
                                 
                 glActiveTexture(GL_TEXTURE0);
@@ -354,7 +445,7 @@ unsigned int loadTexture(const std::string& filePath);
                 // Set position and scale based on cubeIndex
                 switch (cubeIndex) {
                 case 0:
-                    newCube.position = glm::vec3(0.0f, 0.0f, -3.0f); // Default position
+                    newCube.position = glm::vec3(0.0f, 0.5f, -3.0f); // Default position
                     newCube.scale = glm::vec3(2.0f, 2.0f, 2.0f);  // Default scale
                     break;
                 case 1:
@@ -362,11 +453,11 @@ unsigned int loadTexture(const std::string& filePath);
                     newCube.scale = glm::vec3(2.0f, 2.0f, 2.0f);  // Default scale                   
                     break;
                 case 2:
-                    newCube.position = glm::vec3(-6.0f, 0.0f, 0.0f); // Default position
+                    newCube.position = glm::vec3(-6.0f, 0.5f, 0.0f); // Default position
                     newCube.scale = glm::vec3(2.0f, 2.0f, 2.0f); // Default scale
                     break;
                 case 3:
-                    newCube.position = glm::vec3(-5.0f, 0.0f, 3.0f); // Default position
+                    newCube.position = glm::vec3(-5.0f, 0.5f, 3.0f); // Default position
                     newCube.scale = glm::vec3(2.0f, 2.0f, 2.0f); // Default scale
                     break;
                 default: // cube No5
@@ -421,9 +512,9 @@ unsigned int loadTexture(const std::string& filePath);
             // Render all cubes
             for (auto& cube : mycubes) {
                 defaultShader.Use();
-                defaultShader.SendUniformData("projection", projection);
-                defaultShader.SendUniformData("view", view);
-                defaultShader.SendUniformData("model", cube.model);
+                defaultShader.setMat4("projection", projection);
+                defaultShader.setMat4("view", view);
+                defaultShader.setMat4("model", cube.model);
 
                 glActiveTexture(GL_TEXTURE0);
                
@@ -432,64 +523,50 @@ unsigned int loadTexture(const std::string& filePath);
                 defaultCube::Instance()->draw();
             }
                       
-
             //######################### End Draw new cube on button click #############################
                 
+             //###################################### Test Grid Start ###############################
+             // app->getDefaultGridShader().Use();
+            if (!gridNogrid) {   // Show the grid or hide it
 
-            //###################################### Test Grid Start ###############################
+                defaultGridShader.Use();
+                defaultGridShader.setMat4("projection", projection);
+                defaultGridShader.setMat4("view", view);
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f)); // this is better
+                model = glm::scale(model, glm::vec3(20.0f, 0.0f, 20.0f));
+                defaultGridShader.setMat4("model", model);
 
-            defaultGridShader.Use();
-            defaultGridShader.SendUniformData("projection", projection);
-            defaultGridShader.SendUniformData("view", view);
-            model = glm::mat4(1.0f);
-            //model = glm::translate(model, glm::vec3(0.0f, -0.5f, 2.1f));
-            model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f)); // this is better
-            model = glm::scale(model, glm::vec3(20.0f, 0.0f, 20.0f));
-            defaultGridShader.SendUniformData("model", model);
-
-            glBindVertexArray(GridVAO);
-            glDrawArrays(GL_LINES, 0, gridVertices.size());
-            glBindVertexArray(0);
-
+                Grid::Instance()->gridRender();
+            }
             //###################################### Grid End Start of Sky ###############################
+            if (addSky) {
+                glDepthFunc(GL_LEQUAL);
+                skyShader.Use();
 
-            glDepthFunc(GL_LEQUAL);
-            skyShader.Use();
+                view = glm::mat4(1.0f);
+                view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+                model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(0.0f, 0.3f, 0.0f));
+                //projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / SCR_HEIGHT, 0.3f, 10000.0f);
+                skyShader.setMat4("view", view);
+                skyShader.setMat4("projection", projection);
+                glBindVertexArray(skyVAO);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_CUBE_MAP, skyTextureID);
+                glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+                glBindVertexArray(0);
 
-            view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
-            //projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / SCR_HEIGHT, 0.3f, 10000.0f);
-            skyShader.SendUniformData("view", view);
-            skyShader.SendUniformData("projection", projection);
-            view = glm::mat4(1.0f);
-            glBindVertexArray(skyVAO);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, skyTextureID);
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
+                glDepthFunc(GL_LESS);
 
-            glDepthFunc(GL_LESS);
+            }
 
             // ######################################End SkyBox ##################################
 
-            //#################################### FLOOR #################################
-            /*
-            defaultShader.Use();
-            defaultShader.SendUniformData("projection", projection);
-            defaultShader.SendUniformData("view", view);
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(0.0f, -0.7f, 2.1f));
-            model = glm::scale(model, glm::vec3(20.0f, 0.05f, 20.0f));
-            defaultShader.SendUniformData("model", model);
-
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, floorMap);
-
-            glBindVertexArray(planeVAO);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-            glBindVertexArray(0);
+            
+           
 
             //################################## END FLOOR ##############################
-              */
+              
 
 
             MainScreen::Instance()->Unbinde_Frambuffer();
@@ -506,6 +583,9 @@ unsigned int loadTexture(const std::string& filePath);
 
         // close it all down and go to bed.
         // it includes the Imgui stuff
+        glDeleteTextures(1, &skyTextureID);
+       
+        
         glDeleteVertexArrays(1,&skyVAO);
         glDeleteBuffers(1, &skyVBO);
 

@@ -24,7 +24,7 @@ float scale_val[3] = { 1.0f, 1.0f, 1.0f };
 
 int fill = 20; // use this to change how many squares in the grid
 
-bool shouldAddCube = false;
+// bool shouldAddCube = false;
 int cubeIndex = 0;
 bool isSelected = false; // flag to check if a node is selected
 
@@ -135,13 +135,13 @@ public:
                 ImGui::Text("Default Sphere [%d] ", d_SphereId);
 
                 if (ImGui::Button("Add Cube")) {
-                    shouldAddCube = true;
+                   // shouldAddCube = true;
                     cubeIndex++; //add 1 to the index
                    // std::cout << "Index is: " << cubeIndex << std::endl;
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("Remove Cube")) {
-                    shouldAddCube = false;
+                    //shouldAddCube = false;
                     cubeIndex--; // remove 1 from index
                     // will need a way to keep track of this cubeindex
                 }
