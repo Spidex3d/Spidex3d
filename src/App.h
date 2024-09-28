@@ -1,11 +1,14 @@
 #pragma once
+#include "../Shader/ShaderManager.h"
 
-#include "../Shader/Shader.h"
 
 
 class App
 {
 public:
+    App();
+    ~App();
+
 	static App* Instance();
 
     bool AppRun();
@@ -14,14 +17,12 @@ public:
 
     void appInIt();
 
-    void ShaderManager();
 
-    Shader& getDefaultGridShader();
+
+   
 
 private:
-    //Shader defaultShader;
-    //Shader defaultGridShader;
-    //Shader defaultTestShader;
-    //Shader skyShader;
+    
+    bool IsRunning = true;
 };
 

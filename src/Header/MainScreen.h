@@ -28,7 +28,9 @@ class MainScreen
 public:
 
 	static MainScreen* Instance();
+	
 
+	// ###############
 	void Initialize(GLFWwindow* window);
 	// ImGui Start
 	void SetImGui(GLFWwindow* window);

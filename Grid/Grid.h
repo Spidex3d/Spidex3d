@@ -12,7 +12,6 @@ public:
 
     void gridSetUp();
 
-    void setUpRender();
 
     void gridRender();
 

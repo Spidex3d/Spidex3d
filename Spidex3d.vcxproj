@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClCompile Include="Lighting\Lights.cpp" />
     <ClCompile Include="Objects\spxObjLoader.cpp" />
+    <ClCompile Include="Shader\ShaderManager.cpp" />
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="Grid\Grid.cpp" />
     <ClCompile Include="Objects\DefaultCube.cpp" />
@@ -158,12 +159,14 @@
     <ClCompile Include="vendors\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="vendors\imgui\imgui_tables.cpp" />
     <ClCompile Include="vendors\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Windows\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lighting\Lights.h" />
     <ClInclude Include="Objects\spxObjLoader.h" />
     <ClInclude Include="Object_loader\Mesh.h" />
     <ClInclude Include="Object_loader\Model.h" />
+    <ClInclude Include="Shader\ShaderManager.h" />
     <ClInclude Include="src\App.h" />
     <ClInclude Include="Objects\DefaultCube.h" />
     <ClInclude Include="Grid\Grid.h" />
@@ -272,6 +275,7 @@
     <ClInclude Include="vendors\imgui\imstb_rectpack.h" />
     <ClInclude Include="vendors\imgui\imstb_textedit.h" />
     <ClInclude Include="vendors\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\Windows\WindowManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Fonts\comic.ttf" />

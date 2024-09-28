@@ -1,17 +1,10 @@
 #include "Header/MainScreen.h"
 #include "../SpdLog/LogInternals.h"
-//#include "GameInput.h"
-//include "../MeshObjects/Mesh.h"
-//#include "Header/Utility.h"
+
 #include "Header\FileManager.h"
 #include <imgui\ImGuiAF.h>
-//#include <imgui\imgui_internal.h>
+
 #include <stdio.h>
-
-
-
-
-
 
 
 static bool show_app_dockspace = false;
@@ -25,15 +18,7 @@ MainScreen* MainScreen::Instance()
 
 void MainScreen::Initialize(GLFWwindow* window)
 {   
-   
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to loade glad" << std::endl;
-    }
-    else {
-        LogInternals::Instance()->Info("Glad Loaded Correctly");
-    }
-
+    
     // Load an icon
     GLFWimage images[1];
     images[0].pixels = stbi_load("Textures/Icon.png", &images[0].width, &images[0].height, 0, 4); // rgba = png

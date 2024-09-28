@@ -2,6 +2,7 @@
 #include "../SpdLog/LogInternals.h"
 
 #include "../Shader/Shader.h"
+//#include "../Shader/ShaderManager.h" this is in app.h
 
 #include "Header/Textures.h"
 
@@ -19,20 +20,15 @@
 
 #include "Windows\spxWindows.h"
 
+#include "Windows\WindowManager.h"
+
 #include <iostream>
 #include <vector>
 #include <string>
 
-//#include "App.h"
+#include "App.h"
 
 unsigned int loadTexture(const std::string& filePath);
-
-//int fill = 20; // use this to change how many squares in the grid
-
-    //Shader defaultShader;
-    //Shader defaultGridShader;
-    //Shader defaultTestShader;
-    //Shader skyShader;
 
     unsigned int defaultMap; // cube map spidex
     unsigned int floorMap;  // floor map
@@ -47,10 +43,9 @@ unsigned int loadTexture(const std::string& filePath);
     GLuint vbo;
     GLuint ebo;
 
-   //  updateCubePosition(cubeIndexTM, newCubePosition, newCubeScale, newCubeRotation);
+   
 
     // update cube position
-    //void updateCubePosition(int index, glm::vec3 newPosition) {
     void updateCubePosition(int index, glm::vec3 newPosition, glm::vec3 newScale) {
         if (index >= 0 && index < mycubes.size()) {
             mycubes[index].position = newPosition, mycubes[index].scale = newScale;
@@ -82,64 +77,28 @@ unsigned int loadTexture(const std::string& filePath);
 
     }; 
 
-   
-   
-
-
     
     int main(void)
     {
+       
+
         LogInternals::Instance()->Initialize();
 
-        if (!glfwInit())
-            return -1;
-
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-
-        // set up the window here
-        GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Spidex 3d Engine", NULL, NULL);
-
-        // Did we create a window
-        if (!window)
-        {
-            glfwTerminate();
+        WindowManager windowManager(SCR_WIDTH, SCR_HEIGHT, "Spidex 3d Engine");
+        if (!windowManager.GLFWInitialize()) {
             return -1;
         }
-        else {
-            LogInternals::Instance()->Info("Window created successfully");
-        }
 
-        int bufferWidth, bufferHeight;
-        glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
+        glfwSetCursorPosCallback(windowManager.GetWindow(), mouse_callback);
+        glfwSetScrollCallback(windowManager.GetWindow(), scroll_callback);
 
-        glfwMakeContextCurrent(window);
-        glfwSwapInterval(1); // Enable vsync
+        // icon
+        MainScreen::Instance()->Initialize(windowManager.GetWindow()); //  window icon
 
-        //glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-        glfwSetCursorPosCallback(window, mouse_callback);
-        glfwSetScrollCallback(window, scroll_callback);
-
-
-        MainScreen::Instance()->Initialize(window); // MakeContextCurrent - glad and window icon
-
-        glViewport(0, 0, bufferWidth, bufferHeight);
-
-
-        MainScreen::Instance()->SetImGui(window); // ImGui setup
-
-        //################################ Load Shader Files #######################################
-        //Shader defaultShader;
-        //defaultShader.Load("Shader/shaderFile/default.vert", "Shader/shaderFile/default.frag");
-        Shader defaultShader("Shader/shaderFile/default.vert", "Shader/shaderFile/default.frag");
-        Shader defaultGridShader("Shader/shaderFile/default_Grid.vert", "Shader/shaderFile/default_Grid.frag");
+        MainScreen::Instance()->SetImGui(windowManager.GetWindow()); // ImGui setup
         
-        Shader LightBulbShader("Shader/shaderFile/bulb.vert", "Shader/shaderFile/bulb.frag");
-        Shader LightCubeShader("Shader/shaderFile/light.vert", "Shader/shaderFile/light.frag");
 
-        Shader skyShader("Shader/shaderFile/sky.vert", "Shader/shaderFile/sky.frag");
+       // Shader skyShader("Shader/shaderFile/sky.vert", "Shader/shaderFile/sky.frag");
         
        // flip image
         stbi_set_flip_vertically_on_load(true);
@@ -240,31 +199,33 @@ unsigned int loadTexture(const std::string& filePath);
         float posy = 2.0f;
 
         SkyBox();
-        Grid::Instance()->gridSetUp();
 
         float angel = 0.0f;  // to do with the light
 
-        ////Grid::Instance()->gridSetUp();
-        //App* app = App::Instance();
-        //app->appInIt();
+        App* app = App::Instance();
+        // Initialize the application
+        app->appInIt();
+        
+        App::Instance()->appInIt();
+        App::Instance()->AppRun();
 
     // do the while loop here
-        while (!glfwWindowShouldClose(window))
+        while (!glfwWindowShouldClose(windowManager.GetWindow()))
         {
-
+            
             float currentFrame = static_cast<float>(glfwGetTime());
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
 
             float time = glfwGetTime();
 
-            processInput(window);
+            processInput(windowManager.GetWindow());
 
             MainScreen::Instance()->PollEvents();
 
 
             // ################## Start ImGui ####################################
-            MainScreen::Instance()->NewImguiFrame(window); // 1 New ImGui Frame
+            MainScreen::Instance()->NewImguiFrame(windowManager.GetWindow()); // 1 New ImGui Frame
 
             // MainScreen::Instance()->ClearScreen();
 
@@ -272,11 +233,11 @@ unsigned int loadTexture(const std::string& filePath);
 
             bool doc = true;
             MainScreen::Instance()->MainDockSpace(&doc); // Docking
-            MainScreen::Instance()->MainScean(window); // This is the ImGui Scene Window which we are drawing are cube in
-            MainScreen::Instance()->ImGuiMainMenu(window);//2 Main Window Menu
-            MainScreen::Instance()->ConsolPanel(window); // 3
+            MainScreen::Instance()->MainScean(windowManager.GetWindow()); // This is the ImGui Scene Window which we are drawing are cube in
+            MainScreen::Instance()->ImGuiMainMenu(windowManager.GetWindow());//2 Main Window Menu
+            MainScreen::Instance()->ConsolPanel(windowManager.GetWindow()); // 3
             //MainScreen::Instance()->ImGuiElimentWindow(window);  
-            MainScreen::Instance()->AboutWindow(window); // About Window
+            MainScreen::Instance()->AboutWindow(windowManager.GetWindow()); // About Window
 
             // ############### ECS ######################
             //SolidComponents::Instance()->GuiEntityPanel(window); //  Eliments Panel left 
@@ -298,15 +259,15 @@ unsigned int loadTexture(const std::string& filePath);
 
             // ############################### Lighting ###############################
 
-            LightCubeShader.Use();
-            LightCubeShader.setVec3("light.position", lightPos);
-            LightCubeShader.setVec3("viewPos", camera.Position);
-            LightCubeShader.setVec3("light.ambient", 1.8f, 1.8f, 1.8f);
-            LightCubeShader.setVec3("light.diffuse", 1.5f, 1.5f, 1.5f);
-            LightCubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-            LightCubeShader.setVec3("matirial.specular", 0.5f, 0.5f, 0.5f);
-            LightCubeShader.setFloat("matirial.shininess", 60.0f);
+            ShaderManager::LightCubeShader->Use();
+            ShaderManager::LightCubeShader->setVec3("light.position", lightPos);
+            ShaderManager::LightCubeShader->setVec3("viewPos", camera.Position);
+            ShaderManager::LightCubeShader->setVec3("light.ambient", 1.8f, 1.8f, 1.8f);
+            ShaderManager::LightCubeShader->setVec3("light.diffuse", 1.5f, 1.5f, 1.5f);
+            ShaderManager::LightCubeShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+                                          
+            ShaderManager::LightCubeShader->setVec3("matirial.specular", 0.5f, 0.5f, 0.5f);
+            ShaderManager::LightCubeShader->setFloat("matirial.shininess", 60.0f);
 
             glm::vec3 viewPos;
             
@@ -330,13 +291,13 @@ unsigned int loadTexture(const std::string& filePath);
             //view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
             //defaultShader.SendUniformData("projection", projection);
             //defaultShader.setMat4("projection", projection);
-            LightCubeShader.setMat4("projection", projection);
+            ShaderManager::LightCubeShader->setMat4("projection", projection);
             
             //defaultShader.SendUniformData("view", view);
-            LightCubeShader.setMat4("view", view);
+            ShaderManager::LightCubeShader->setMat4("view", view);
             //defaultShader.setMat4("view", view);
             glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-            LightCubeShader.setMat4("model", model);
+            ShaderManager::LightCubeShader->setMat4("model", model);
             //defaultShader.setMat4("model", model);
 
             MainScreen::Instance()->ClearScreen();
@@ -347,9 +308,9 @@ unsigned int loadTexture(const std::string& filePath);
            
 
             // ######################################### Default Cube #######################################
-            LightCubeShader.Use();
-            LightCubeShader.setMat4("projection", projection);
-            LightCubeShader.setMat4("view", view);
+            ShaderManager::LightCubeShader->Use();
+            ShaderManager::LightCubeShader->setMat4("projection", projection);
+            ShaderManager::LightCubeShader->setMat4("view", view);
             model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
             //model = glm::translate(model, glm::vec3(pos_val[0], pos_val[1], pos_val[2])); // cubePositions[0]);
             model = glm::translate(model,glm::vec3(0.0f, 0.0f, 1.0f)); // cubePositions[0]);
@@ -362,7 +323,7 @@ unsigned int loadTexture(const std::string& filePath);
             }
             //model = glm::rotate(model, glm::radians(45.0f), glm::vec3(rot_val[0], rot_val[1], rot_val[2]));
 
-            LightCubeShader.setMat4("model", model);
+            ShaderManager::LightCubeShader->setMat4("model", model);
 
 
             glActiveTexture(GL_TEXTURE0);
@@ -373,34 +334,32 @@ unsigned int loadTexture(const std::string& filePath);
 
             // ######################################### END Default Cube #######################################
             
-            LightCubeShader.Use();
-            LightCubeShader.setMat4("view", view);
-            LightCubeShader.setMat4("projection", projection);
-            LightCubeShader.setVec3("viewPos", viewPos);
-            LightCubeShader.setVec3("lightColor", lightColor);
-            LightCubeShader.setVec3("lightPos", lightPos);
+            ShaderManager::LightCubeShader->Use();
+            ShaderManager::LightCubeShader->setMat4("view", view);
+            ShaderManager::LightCubeShader->setMat4("projection", projection);
+            ShaderManager::LightCubeShader->setVec3("viewPos", viewPos);
+            ShaderManager::LightCubeShader->setVec3("lightColor", lightColor);
+            ShaderManager::LightCubeShader->setVec3("lightPos", lightPos);
 
             //             ################### draw obj mesh ###################
             for (int i = 0; i < numModels; i++)
             {
                 model = glm::translate(glm::mat4(1.0f), modPos[i]) * glm::scale(glm::mat4(1.0f), modScale[i]);
-                LightCubeShader.setMat4("model", model);
+                ShaderManager::LightCubeShader->setMat4("model", model);
                 glBindTexture(GL_TEXTURE_2D, texture[i]);
                 mesh[i].objDraw();
                 glBindTexture(texture[i], 0);
-            }
-            
-                
+            }        
 
              //                           ### Light OBJ ######   
                 
                 model = glm::translate(model = glm::mat4(1.0f), lightPos);
-                LightBulbShader.Use();
+                ShaderManager::LightBulbShader->Use();
                 //LightBulbShader.setVec3("lightColor", lightColor);
-                LightBulbShader.setVec3("lightColor", amb_light[0], amb_light[1], amb_light[2]);
-                LightBulbShader.setMat4("model", model);
-                LightBulbShader.setMat4("view", view);
-                LightBulbShader.setMat4("projection", projection);
+                ShaderManager::LightBulbShader->setVec3("lightColor", amb_light[0], amb_light[1], amb_light[2]);
+                ShaderManager::LightBulbShader->setMat4("model", model);
+                ShaderManager::LightBulbShader->setMat4("view", view);
+                ShaderManager::LightBulbShader->setMat4("projection", projection);
                 lightMesh.objDraw();
             
             //###################################### Test Render 10 multiple cubes Start ###############################
@@ -408,9 +367,9 @@ unsigned int loadTexture(const std::string& filePath);
             for (int idxCube = 0; idxCube < 10; ++idxCube) {
                 // this loops 10 times
 
-                LightCubeShader.Use();
-                LightCubeShader.setMat4("projection", projection);
-                LightCubeShader.setMat4("view", view);
+                ShaderManager::LightCubeShader->Use();
+                ShaderManager::LightCubeShader->setMat4("projection", projection);
+                ShaderManager::LightCubeShader->setMat4("view", view);
 
                 glm::mat4 model = glm::mat4(1.0f);
 
@@ -426,7 +385,7 @@ unsigned int loadTexture(const std::string& filePath);
                 else {
                     model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
                 }
-                LightCubeShader.setMat4("model", model);
+                ShaderManager::LightCubeShader->setMat4("model", model);
 
                                 
                 glActiveTexture(GL_TEXTURE0);
@@ -511,10 +470,10 @@ unsigned int loadTexture(const std::string& filePath);
 
             // Render all cubes
             for (auto& cube : mycubes) {
-                defaultShader.Use();
-                defaultShader.setMat4("projection", projection);
-                defaultShader.setMat4("view", view);
-                defaultShader.setMat4("model", cube.model);
+                ShaderManager::defaultShader->Use();
+                ShaderManager::defaultShader->setMat4("projection", projection);
+                ShaderManager::defaultShader->setMat4("view", view);
+                ShaderManager::defaultShader->setMat4("model", cube.model);
 
                 glActiveTexture(GL_TEXTURE0);
                
@@ -525,31 +484,32 @@ unsigned int loadTexture(const std::string& filePath);
                       
             //######################### End Draw new cube on button click #############################
                 
-             //###################################### Test Grid Start ###############################
+             //###################################### Grid Start ###############################
              // app->getDefaultGridShader().Use();
             if (!gridNogrid) {   // Show the grid or hide it
 
-                defaultGridShader.Use();
-                defaultGridShader.setMat4("projection", projection);
-                defaultGridShader.setMat4("view", view);
+                ShaderManager::defaultGridShader->Use();
+                
+                ShaderManager::defaultGridShader->setMat4("projection", projection);
+                ShaderManager::defaultGridShader->setMat4("view", view);
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f)); // this is better
                 model = glm::scale(model, glm::vec3(20.0f, 0.0f, 20.0f));
-                defaultGridShader.setMat4("model", model);
+                ShaderManager::defaultGridShader->setMat4("model", model);
 
                 Grid::Instance()->gridRender();
             }
             //###################################### Grid End Start of Sky ###############################
             if (addSky) {
                 glDepthFunc(GL_LEQUAL);
-                skyShader.Use();
+                ShaderManager::skyShader->Use();
 
                 view = glm::mat4(1.0f);
                 view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
                 model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(0.0f, 0.3f, 0.0f));
                 //projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / SCR_HEIGHT, 0.3f, 10000.0f);
-                skyShader.setMat4("view", view);
-                skyShader.setMat4("projection", projection);
+                ShaderManager::skyShader->setMat4("view", view);
+                ShaderManager::skyShader->setMat4("projection", projection);
                 glBindVertexArray(skyVAO);
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_CUBE_MAP, skyTextureID);
@@ -559,28 +519,17 @@ unsigned int loadTexture(const std::string& filePath);
                 glDepthFunc(GL_LESS);
 
             }
-
-            // ######################################End SkyBox ##################################
-
-            
-           
-
-            //################################## END FLOOR ##############################
-              
-
+            // ###################################### End SkyBox ################################## 
 
             MainScreen::Instance()->Unbinde_Frambuffer();
 
             // ############ ImGui Render ######################
-            MainScreen::Instance()->RenderImGui(window); // 5 Put them in this order
+            MainScreen::Instance()->RenderImGui(windowManager.GetWindow()); // 5 Put them in this order
 
-            glfwSwapBuffers(window);
+            glfwSwapBuffers(windowManager.GetWindow());
             glfwPollEvents();
 
         }
-
-       
-
         // close it all down and go to bed.
         // it includes the Imgui stuff
         glDeleteTextures(1, &skyTextureID);
@@ -590,9 +539,7 @@ unsigned int loadTexture(const std::string& filePath);
         glDeleteBuffers(1, &skyVBO);
 
 
-        MainScreen::Instance()->ShutDown();
-
-        
+        MainScreen::Instance()->ShutDown();   
 
         return 0;
     }
