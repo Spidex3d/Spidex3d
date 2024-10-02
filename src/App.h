@@ -1,8 +1,8 @@
 #pragma once
+#include <glm\glm.hpp>
 #include "../Shader/ShaderManager.h"
 
-
-
+    
 class App
 {
 public:
@@ -11,18 +11,13 @@ public:
 
 	static App* Instance();
 
-    bool AppRun();
 
-   
+    void AppRuning();
 
     void appInIt();
-
-
-
-   
+    
 
 private:
     
-    bool IsRunning = true;
 };
 

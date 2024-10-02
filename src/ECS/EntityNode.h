@@ -39,6 +39,7 @@ bool gridNogrid = false;   // Show the grid or hide it
 bool rotateCube = false;
 
 bool shouldAddCube = false;
+std::vector<Cube1> mycubes; // Add a cube with a button click
 
 bool addSky = false;
 
@@ -46,16 +47,17 @@ float amb_light[3] = {
     1.0f, 1.0f, 1.0f
 };
 
-
-std::vector<Cube1> mycubes; // Add a cube with a button click
-
-
-
 struct LightData {
     std::string name;
     int LightId;
-    int LightType;
+    int LightType; // Sun, Ambient, Spot
 };
+
+std::vector<LightData> myLights;
+int LightId = 1;
+int LightTypeID = 0;
+LightData* selectedLightData = nullptr;
+bool shouldAddLight = false;
 
     struct Camera1 {
         std::string name;
@@ -78,16 +80,11 @@ struct LightData {
         int ObjectTypeID;       
 
     };
-    //std::vector<LightData> myLights;
-    std::vector<LightData> myLights = {
-            {"Light1", 1},
-            {"Light2", 2},
-            // Add more lights as needed
-    };
+    
 
     Data1* selectedData = nullptr;
     Camera1* selectedCamData = nullptr;
-    LightData* selectedLightData = nullptr;
+   // LightData* selectedLightData = nullptr;
 
     namespace fs = std::filesystem;
 
@@ -221,7 +218,6 @@ struct LightData {
             
         }
 
-       
 
         void renderUI(std::vector<Data1>& myVector, int& currentIndex,
             int& indexCube, int& indexPlane, int& indexSphere, int ObjectTypeID) {
@@ -641,59 +637,64 @@ struct LightData {
                     ImGui::EndTabItem();
 
                 }
-                
-                if (ImGui::BeginTabItem("Lighting Lab"))
-                {
-                    
-                    ImGui::Text("ID: Light Lab");
-                    ImGui::Text("Spidex Engine New Light Lab", nullptr);
-                    ImGui::Button("Save");
-
-                    
-                    ImGui::SeparatorText(ICON_FA_SPIDER" Light Settings");
-
-                    if (ImGui::TreeNodeEx(ICON_FA_STREET_VIEW" Spidex Lights"))
+                //   ####################################### Lighting Lab #################################
+               
+                    if (ImGui::BeginTabItem("Lighting Lab"))
                     {
+                       
+                        ImGui::Text("ID: Light Lab");
+                        ImGui::Text("Spidex Engine New Light Lab", nullptr);
 
-                        static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow |
-                            ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
-                        static bool align_label_with_current_x_position = false;
-                        static bool test_drag_and_drop = false;
-
-                        if (align_label_with_current_x_position)
-                            ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
-
-                        static int selection_mask = (1 << 2);
-                        int node_clicked = -1;
-
-                        for (auto& data : myLights) {
-                            ImGuiTreeNodeFlags nodeFlags = base_flags | (selectedLightData == &data ? ImGuiTreeNodeFlags_Selected : 0);
-                            bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)data.LightId, nodeFlags,
-                                " Camera: %s : %d : %d ",
-                                data.name.c_str(), data.LightId, data.LightType);
-
-                            if (ImGui::IsItemClicked()) {
-                                selectedLightData = &data;
-                                // Handle selection logic here
-                            }
-
-                            if (nodeOpen) {
-                                // Add child nodes or additional information here if needed
-                                ImGui::TreePop();
-                            }
+                        if (ImGui::Button("Add Light"))
+                        {
+                            myLights.push_back({ " Default_Light", LightId++, LightTypeID });
+                            shouldAddLight = true;
                         }
 
-                        ImGui::TreePop();
-                    }
-                    ImGui::Text("Change light color");
-                    ImGui::ColorEdit4("Color", amb_light);
-                   
-                    ImGui::EndTabItem();
+                        ImGui::SeparatorText(ICON_FA_SPIDER" Light Settings");
 
-                }
+                        auto flags = ROOT_SELECTED_FLAGS;
+                        if (ImGui::TreeNodeEx(ICON_FA_STREET_VIEW" Spidex Lights", flags))
+                        {
+
+                            static bool align_label_with_current_x_position = false;
+                            static bool test_drag_and_drop = false;
+
+                            if (align_label_with_current_x_position)
+                                ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
+
+                            static int selection_mask = (1 << 2);
+                            int node_clicked = -1;
+
+                            for (auto& data : myLights) {
+                                ImGuiTreeNodeFlags nodeFlags = flags | (selectedLightData == &data ? ImGuiTreeNodeFlags_Selected : 0);
+                                bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)data.LightId, nodeFlags,
+                                    " Lights: %s : %d : %d ",
+                                    data.name.c_str(), data.LightId, data.LightType);
+
+                                if (ImGui::IsItemClicked()) {
+                                    selectedLightData = &data;
+                                    // Handle selection logic here
+                                }
+
+                                if (nodeOpen) {
+                                    // Add child nodes or additional information here if needed
+                                    ImGui::TreePop();
+                                }
+                            }
+
+                            ImGui::TreePop();
+                        }
+                        ImGui::Text("Change light color");
+                        ImGui::ColorEdit4("Color", amb_light);
+
+                        ImGui::EndTabItem();
+
+                    }
+                
                 if (ImGui::BeginTabItem("Terraine Lab"))
                 {
-                    ImGui::Text("ID: Sky Lab");
+                    ImGui::Text("ID: Terraine Lab");
                     ImGui::Text("Spidex Engine New Terrain Lab", nullptr);
                     ImGui::Button("Save");
 
@@ -717,10 +718,11 @@ struct LightData {
         Camera1 defaultCamera = { ICON_FA_VIDEO " MainCamera ", 0 };// maincamera with id 0
         
         bool sunLightAdded = false;
+        
        // Lights sunLightMain = { ICON_FA_SUN " World Sun", 1, 1 };
 
-        bool LightAdded = false;
-        LightData LightMain = { ICON_FA_SUN " Light", 1, 2 };
+       /* bool LightAdded = false;
+        LightData LightMain = { ICON_FA_SUN " Light", 1, 2 };*/
 
         char nameBuffer[128] = "";
        // Data1* selectedData = nullptr;

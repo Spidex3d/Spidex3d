@@ -1,5 +1,11 @@
 #pragma once
+#include <glm\glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <cmath>
 #include "Shader.h"
+
+
+
 
 class ShaderManager {
 public:
@@ -9,4 +15,8 @@ public:
     static Shader* LightCubeShader; // Declare the shader as a static member
     static Shader* defaultShader; // Declare the shader as a static member
     static Shader* skyShader; // Declare the shader as a static member
+
+    static void SetUpLightShader();
+
+    
 };

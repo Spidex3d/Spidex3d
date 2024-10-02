@@ -34,7 +34,7 @@ unsigned int loadTexture(const std::string& filePath);
     unsigned int floorMap;  // floor map
 
     // #################  Lights ######
-    glm::vec3 lightPos(1.2f, 1.5f, 2.0f);
+  //  glm::vec3 lightPos(1.2f, 1.5f, 2.0f);
 
     unsigned int lightMap;
     //unsigned int crateMap;    // crate
@@ -83,27 +83,23 @@ unsigned int loadTexture(const std::string& filePath);
        
 
         LogInternals::Instance()->Initialize();
-
+        // set up the glfw window
         WindowManager windowManager(SCR_WIDTH, SCR_HEIGHT, "Spidex 3d Engine");
         if (!windowManager.GLFWInitialize()) {
             return -1;
         }
-
+        // needed for the camera
         glfwSetCursorPosCallback(windowManager.GetWindow(), mouse_callback);
         glfwSetScrollCallback(windowManager.GetWindow(), scroll_callback);
 
-        // icon
+        // load a icon on the main window
         MainScreen::Instance()->Initialize(windowManager.GetWindow()); //  window icon
 
         MainScreen::Instance()->SetImGui(windowManager.GetWindow()); // ImGui setup
         
-
-       // Shader skyShader("Shader/shaderFile/sky.vert", "Shader/shaderFile/sky.frag");
         
        // flip image
         stbi_set_flip_vertically_on_load(true);
-
-        //int width, height, nrChannels;
 
         std::string texPath = "Textures/";
         std::string texImg = "github.jpg";
@@ -118,7 +114,7 @@ unsigned int loadTexture(const std::string& filePath);
         crateMap = loadTexture((texPath + crateImg).c_str());
         std::string myTexturePath;
 
-        //                       ############ OBJ loder ########     
+        //                       ############ OBJ loder ############     
 
         const int numModels = 5;
         spxObjLoader mesh[numModels];
@@ -136,16 +132,14 @@ unsigned int loadTexture(const std::string& filePath);
         texture[1] = loadTexture("Object_loader/models/robot_diffuse.jpg");
         texture[2] = loadTexture("Object_loader/models/tile_floor.jpg");
         texture[3] = loadTexture("Object_loader/models/bunny_diffuse.jpg");
-        //texture[4] = loadTexture("Object_loader/models/AMF.tga"); // bowling pin tga big file
-        texture[4] = loadTexture("Object_loader/models/Pin.jpg");  // bowling pin jpg small file
-        
-
+        //texture[4] = loadTexture("Object_loader/models/AMF.tga"); // bowling pin with .tga big file
+        texture[4] = loadTexture("Object_loader/models/Pin.jpg");  // bowling pin with .jpg small file
+        // add a light mesh on need for a texture
         spxObjLoader lightMesh;
         lightMesh.loadOBJ("Object_loader/models/light.obj");
-        //############################## Assimp Test #####################################
 
+        //############################## Assimp Test ####################################
         //Assimp::Importer imp;
-
         //############################## End Assimp Test #####################################
 
         glm::vec3 modPos[] = {
@@ -202,14 +196,17 @@ unsigned int loadTexture(const std::string& filePath);
 
         float angel = 0.0f;  // to do with the light
 
-        App* app = App::Instance();
-        // Initialize the application
-        app->appInIt();
-        
+               
         App::Instance()->appInIt();
-        App::Instance()->AppRun();
+        myLights.push_back({ ICON_FA_SUN" Ambient_Light", 0, LightTypeID });
+        
+        glm::vec3 viewPos;
+        glm::vec3 lightPos(0.0f, 1.0f, 6.0f);
+     
+        
 
     // do the while loop here
+        
         while (!glfwWindowShouldClose(windowManager.GetWindow()))
         {
             
@@ -258,20 +255,13 @@ unsigned int loadTexture(const std::string& filePath);
             SolidComponents::Instance()->BgColour();
 
             // ############################### Lighting ###############################
-
-            ShaderManager::LightCubeShader->Use();
-            ShaderManager::LightCubeShader->setVec3("light.position", lightPos);
-            ShaderManager::LightCubeShader->setVec3("viewPos", camera.Position);
-            ShaderManager::LightCubeShader->setVec3("light.ambient", 1.8f, 1.8f, 1.8f);
-            ShaderManager::LightCubeShader->setVec3("light.diffuse", 1.5f, 1.5f, 1.5f);
-            ShaderManager::LightCubeShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-                                          
-            ShaderManager::LightCubeShader->setVec3("matirial.specular", 0.5f, 0.5f, 0.5f);
-            ShaderManager::LightCubeShader->setFloat("matirial.shininess", 60.0f);
-
-            glm::vec3 viewPos;
+           // App::Instance()->AppRuning();
+                                         
+           
+          
+           // glm::vec3 viewPos;
             
-            glm::vec3 lightPos(0.0f, 1.0f, 6.0f);
+           // glm::vec3 lightPos(0.0f, 1.0f, 6.0f);
           //  glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
             glm::vec3 lightColor(amb_light[0], amb_light[1], amb_light[2]);
 
@@ -531,16 +521,14 @@ unsigned int loadTexture(const std::string& filePath);
 
         }
         // close it all down and go to bed.
-        // it includes the Imgui stuff
         glDeleteTextures(1, &skyTextureID);
-       
-        
         glDeleteVertexArrays(1,&skyVAO);
         glDeleteBuffers(1, &skyVBO);
 
-
+        // it includes the Imgui stuff
         MainScreen::Instance()->ShutDown();   
 
+        
         return 0;
     }
     
