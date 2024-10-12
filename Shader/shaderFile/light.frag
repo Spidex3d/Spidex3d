@@ -28,12 +28,13 @@ out vec4 FragColor;
 uniform sampler2D texSampler1;
 uniform vec3 lightPos;
 uniform vec3 lightColor;
+uniform float ambientFactor;
 uniform vec3 viewPos;
 
 void main()
 {
     // Ambient
-    float ambientFactor = 0.1f;
+   // float ambientFactor = 0.3f;
     vec3 ambient = lightColor * ambientFactor;
     //vec3 ambient = light.ambient * texture(material.diffuse, TexCoords).rgb;
 
@@ -55,6 +56,4 @@ void main()
     vec4 texel = texture(texSampler1, TexCoords);
     FragColor = vec4(ambient + diffuse + specular, 1.0f) * texel; 
 
-   // FragColor = vec4(lightColor * objectColor, 1.0); 
-    //FragColor = vec4(1.0, 0.0, 0.2, 1.0); 
 }

@@ -27,6 +27,7 @@ void MainScreen::Initialize(GLFWwindow* window)
 
 }
 
+
 void MainScreen::SetImGui(GLFWwindow* window)
 {
     
@@ -43,11 +44,7 @@ void MainScreen::SetImGui(GLFWwindow* window)
     ImGui_ImplOpenGL3_Init(SHADER_VERSION);
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     
-    // Set up my own Fonts
-    //ImGui::GetIO().Fonts->AddFontFromFileTTF(FONT_PATH_MAIN, FONT_SIZE);
-    //ImGui::GetIO().Fonts->Build();
-
-   
+    
     // Make it possible to use Icons From FontAwesome5
     ImFontConfig fontconfig;
     fontconfig.MergeMode = true;
@@ -56,11 +53,15 @@ void MainScreen::SetImGui(GLFWwindow* window)
     
 
     fontconfig.GlyphOffset = ImVec2(0.0f, 1.0f);
-    io.Fonts->AddFontFromFileTTF(ROBOTO_REG_PATH, FONT_SIZE);
+    //io.Fonts->AddFontFromFileTTF(ROBOTO_REG_PATH, FONT_SIZE); // sandard font type
+    io.Fonts->AddFontFromFileTTF(FONT_PATH_MAIN, FONT_SIZE); // comic sans font type
     io.Fonts->AddFontFromFileTTF(FA_SOLID_PATH, FONT_SIZE, &fontconfig, ranges);
-
-
     
+}
+
+void MainScreen::ImGuiInit(GLFWwindow* window)
+{
+    // MainScreen::Instance()->NewImguiFrame(window);
 }
 
 void MainScreen::NewImguiFrame(GLFWwindow* window)

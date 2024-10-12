@@ -1,4 +1,5 @@
 #include "Lights.h"
+#include "../Shader/ShaderManager.h"
 
 Lights* Lights::Instance()
 {
@@ -9,6 +10,8 @@ Lights* Lights::Instance()
 
 void Lights::LightSetUp()
 {
+    //ShaderManager::LightCubeShader->Use();
+    //ShaderManager::LightCubeShader->setMat4("view", view);
 
 }
 

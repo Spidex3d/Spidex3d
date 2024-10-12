@@ -43,8 +43,12 @@ std::vector<Cube1> mycubes; // Add a cube with a button click
 
 bool addSky = false;
 
+float ambient_factor[1] = { 0.1f };
 float amb_light[3] = {
     1.0f, 1.0f, 1.0f
+};
+float move_light[3] = {
+    0.0f, 1.0f, 6.0f
 };
 
 struct LightData {
@@ -274,9 +278,9 @@ bool shouldAddLight = false;
                     
                     if (ImGui::IsItemHovered()) {
                         
-                        this->nodeButtons();
+                       // this->nodeButtons();
                         // Perform actions when the node is hovered
-                       // ImGui::SetTooltip("Hovered over %s", data.value.c_str());
+                        ImGui::SetTooltip("Right click to Edit %s", data.value.c_str());
                     }
 
                     if (ImGui::BeginPopup("NodePopup")) {
@@ -651,7 +655,7 @@ bool shouldAddLight = false;
                             shouldAddLight = true;
                         }
 
-                        ImGui::SeparatorText(ICON_FA_SPIDER" Light Settings");
+                        ImGui::SeparatorText(ICON_FA_SPIDER" Lights in Scean");
 
                         auto flags = ROOT_SELECTED_FLAGS;
                         if (ImGui::TreeNodeEx(ICON_FA_STREET_VIEW" Spidex Lights", flags))
@@ -685,8 +689,18 @@ bool shouldAddLight = false;
 
                             ImGui::TreePop();
                         }
-                        ImGui::Text("Change light color");
-                        ImGui::ColorEdit4("Color", amb_light);
+                        ImGui::SeparatorText(ICON_FA_SPIDER" Light Settings");
+                        ImGui::Text("Change Ambient Factor");
+                        ImGui::DragFloat("Ambient", ambient_factor, 0.0f);
+                        ImGui::Text("Light Position");
+                        ImGui::DragFloat3("Position", move_light, 0.0f, 1.0f, 6.0f);
+                       // ImGui::DragFloat3("Position", lighPos, 0.5f, 1.0f, 5.0f);
+                       // ImGui::DragFloat3("Position", lighPos, 0.5f, 1.0f, 5.0f);
+
+
+
+                        ImGui::Text("Change light color"); 
+                        ImGui::ColorEdit4("Color", amb_light); // Light colour
 
                         ImGui::EndTabItem();
 
@@ -713,19 +727,12 @@ bool shouldAddLight = false;
     private:
        // Data1* selectedData = nullptr;      
 
-        bool showObjectEditor = false;
+        bool showObjectEditor = false; // for editing the cubes
         bool cameraAdded = false;
-        Camera1 defaultCamera = { ICON_FA_VIDEO " MainCamera ", 0 };// maincamera with id 0
-        
-        bool sunLightAdded = false;
-        
-       // Lights sunLightMain = { ICON_FA_SUN " World Sun", 1, 1 };
+        Camera1 defaultCamera = { ICON_FA_VIDEO " MainCamera ", 0 };// maincamera with id 0       
 
-       /* bool LightAdded = false;
-        LightData LightMain = { ICON_FA_SUN " Light", 1, 2 };*/
-
-        char nameBuffer[128] = "";
-       // Data1* selectedData = nullptr;
+        char nameBuffer[128] = ""; // for renaming the cubes
+      
        
 
         void onRightClick() {
@@ -745,32 +752,7 @@ bool shouldAddLight = false;
         GLuint texture7 = loadTexture("Textures/skybox/GreenSky/front.jpg");
         GLuint texture8 = loadTexture("Textures/skybox/NightSky/front.jpg");
         GLuint texture9 = loadTexture("Textures/skybox/SifiSky/front.jpg");
-
-        // ################################### Will come back to this ####################
-        SPIDEX_INLINE void nodeButtons() {
-            //ImVec2 size(getLineHeight() - 3.0f, getLineHeight() - 3.0f);
-             ImVec2 size(getLineHeight() - 4.0f, - 0.0f); // could be done like this
-            float offset = ImGui::GetWindowWidth() -50.0f;
-            
-            ImGui::SameLine(offset);
-            
-            if (IconButton(ICON_FA_TRASH_ALT, size)) {
-                // delete
-            }
-            ImGui::SameLine(offset - 35.0f);
-            if (IconButton(ICON_FA_COPY, size)) {
-                // clone
-            }
-            ImGui::SameLine(offset - 75.0f);
-            if (IconButton(ICON_FA_PEN_ALT, size)) { // :ICON_FA_EYE
-                // Edit Name
-               
-            }
-
-            // this is the little buttons on the entity node!
-        }
-
-        
+      
 
     };
 

@@ -1,6 +1,8 @@
 #include "App.h"
 #include <iostream>
 #include "../Grid/Grid.h"
+#include "Header\MainScreen.h"
+
 
 
 
@@ -25,6 +27,7 @@ void App::AppRuning()
    
 }
 
+
 void App::appInIt()
 {
     
@@ -36,6 +39,14 @@ void App::appInIt()
     ShaderManager::SetupShaders();
    
    
+}
+
+void App::ImGuiInit()
+{
+   // bool doc = true;
+   // MainScreen::Instance()->MainDockSpace(&doc); // Docking
+   //// MainScreen::Instance()->MainScean(windowManager.GetWindow());
+
 }
 
 

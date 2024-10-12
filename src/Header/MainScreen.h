@@ -34,6 +34,9 @@ public:
 	void Initialize(GLFWwindow* window);
 	// ImGui Start
 	void SetImGui(GLFWwindow* window);
+
+	void ImGuiInit(GLFWwindow* window);
+
 	void NewImguiFrame(GLFWwindow* window);
 	void RenderImGui(GLFWwindow* window);
 	void MainDockSpace(bool* p_open); // docking space

@@ -5,13 +5,6 @@
 #include <string>
 #include <vector>
 
-//struct LightData {
-//	std::string name;
-//	int LightId;
-//	int LightType;
-//};
-//
-//	LightData* selectedLightData = nullptr;
 
 class Lights
 {

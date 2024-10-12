@@ -26,6 +26,8 @@
 #include <vector>
 #include <string>
 
+#include "../Lighting/Lights.h"
+
 #include "App.h"
 
 unsigned int loadTexture(const std::string& filePath);
@@ -84,6 +86,7 @@ unsigned int loadTexture(const std::string& filePath);
 
         LogInternals::Instance()->Initialize();
         // set up the glfw window
+       
         WindowManager windowManager(SCR_WIDTH, SCR_HEIGHT, "Spidex 3d Engine");
         if (!windowManager.GLFWInitialize()) {
             return -1;
@@ -190,7 +193,7 @@ unsigned int loadTexture(const std::string& filePath);
         int indexSphere = 0;
         int EntityID = 0; // Example EntityID
         
-        float posy = 2.0f;
+        float posy = 2.0f; // move the 10 cubes + 2 on the x
 
         SkyBox();
 
@@ -201,7 +204,7 @@ unsigned int loadTexture(const std::string& filePath);
         myLights.push_back({ ICON_FA_SUN" Ambient_Light", 0, LightTypeID });
         
         glm::vec3 viewPos;
-        glm::vec3 lightPos(0.0f, 1.0f, 6.0f);
+        glm::vec3 lightPos(0.0f, 1.0f, 6.0f); // start of light position
      
         
 
@@ -224,9 +227,8 @@ unsigned int loadTexture(const std::string& filePath);
             // ################## Start ImGui ####################################
             MainScreen::Instance()->NewImguiFrame(windowManager.GetWindow()); // 1 New ImGui Frame
 
-            // MainScreen::Instance()->ClearScreen();
-
             ImGui::NewFrame();
+           // MainScreen::Instance()->ImGuiInit(windowManager.GetWindow());
 
             bool doc = true;
             MainScreen::Instance()->MainDockSpace(&doc); // Docking
@@ -261,17 +263,12 @@ unsigned int loadTexture(const std::string& filePath);
           
            // glm::vec3 viewPos;
             
-           // glm::vec3 lightPos(0.0f, 1.0f, 6.0f);
-          //  glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+            //glm::vec3 lightPos(0.0f, 1.0f, 6.0f);
+            float ambientFactor(ambient_factor[0]);
             glm::vec3 lightColor(amb_light[0], amb_light[1], amb_light[2]);
-
+            glm::vec3 lightPos(move_light[0], move_light[1], move_light[2]);
             angel += (float)deltaTime * 50.0f;
             lightPos.x = 4.0f * sinf(glm::radians(angel));
-
-            
-
-
-
 
 
             // ###################################### Camera Control ########################################
@@ -324,11 +321,14 @@ unsigned int loadTexture(const std::string& filePath);
 
             // ######################################### END Default Cube #######################################
             
-            ShaderManager::LightCubeShader->Use();
+            Lights::Instance()->LightSetUp();
+
+           // ShaderManager::LightCubeShader->Use();
             ShaderManager::LightCubeShader->setMat4("view", view);
             ShaderManager::LightCubeShader->setMat4("projection", projection);
             ShaderManager::LightCubeShader->setVec3("viewPos", viewPos);
             ShaderManager::LightCubeShader->setVec3("lightColor", lightColor);
+            ShaderManager::LightCubeShader->setFloat("ambientFactor", ambientFactor);
             ShaderManager::LightCubeShader->setVec3("lightPos", lightPos);
 
             //             ################### draw obj mesh ###################
@@ -460,10 +460,10 @@ unsigned int loadTexture(const std::string& filePath);
 
             // Render all cubes
             for (auto& cube : mycubes) {
-                ShaderManager::defaultShader->Use();
-                ShaderManager::defaultShader->setMat4("projection", projection);
-                ShaderManager::defaultShader->setMat4("view", view);
-                ShaderManager::defaultShader->setMat4("model", cube.model);
+                ShaderManager::LightCubeShader->Use();
+                ShaderManager::LightCubeShader->setMat4("projection", projection);
+                ShaderManager::LightCubeShader->setMat4("view", view);
+                ShaderManager::LightCubeShader->setMat4("model", cube.model);
 
                 glActiveTexture(GL_TEXTURE0);
                

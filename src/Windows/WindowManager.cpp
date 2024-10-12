@@ -2,6 +2,7 @@
 #include "../SpdLog/LogInternals.h"
 #include <iostream>
 
+
 WindowManager::WindowManager(int width, int height, const char* title)
 	: width(width), height(height), title(title), window(nullptr) {}
 
@@ -44,6 +45,7 @@ bool WindowManager::GLFWInitialize()
     else {
         LogInternals::Instance()->Info("Glad Loaded Correctly");
     }
+    
 
      glViewport(0, 0, bufferWidth, bufferHeight);
 
