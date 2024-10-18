@@ -16,36 +16,34 @@
 #include "../SkyBox/skyBox.h"
 
 
+bool gridNogrid = false;   // Show the grid or hide it
+
+// #########################################  Cubes ########################################
 struct Cube1 {
     glm::vec3 position;
     glm::mat4 model;
     glm::vec3 scale;
-    unsigned int textureID;
-    
-
+    unsigned int textureID;  
 };
 
 int objectUpdateIndex = -1;
 
-bool shouldUpdateObject = false;
-bool shouldDeleteObject = false;
+bool shouldUpdateObject = false; // cube
+bool shouldDeleteObject = false; // cube
 
 //GLuint myNewTexture;
-extern GLuint myTexture = 0;
+extern GLuint myTexture = 0;  // cube texture
 extern unsigned int crateMap = 0;
 
-bool gridNogrid = false;   // Show the grid or hide it
 
-bool rotateCube = false;
-
-bool shouldAddCube = false;
+bool rotateCube = false;     // rotate a cube 
+bool shouldAddCube = false; // Add a cube with a button click
 std::vector<Cube1> mycubes; // Add a cube with a button click
 
-bool addSky = false;
-
+// #########################################  Lighting ########################################
 float ambient_factor[1] = { 0.1f };
-float amb_light[3] = {
-    1.0f, 1.0f, 1.0f
+float amb_light[4] = {
+    1.0f, 1.0f, 1.0f, 1.0f
 };
 float move_light[3] = {
     0.0f, 1.0f, 6.0f
@@ -63,19 +61,28 @@ int LightTypeID = 0;
 LightData* selectedLightData = nullptr;
 bool shouldAddLight = false;
 
+// LightData* selectedLightData = nullptr;
+// #########################################  End Lighting ########################################
+// 
+// #########################################  Camera       ########################################
+
     struct Camera1 {
         std::string name;
         int camId;
     };
+    Camera1* selectedCamData = nullptr;
+// #########################################  End Camera start Terrain ########################################
 
     struct Terrain {
         std::string name;
         int terrainId;
     };
-
+// #########################################  End Terrain start Sky  ########################################
+    bool addSky = false;
     struct SkyBox {
         std::string name;
     };
+// #########################################  End Sky start Data1  ########################################
 
     struct Data1 {
         int index;
@@ -85,10 +92,11 @@ bool shouldAddLight = false;
 
     };
     
-
     Data1* selectedData = nullptr;
-    Camera1* selectedCamData = nullptr;
-   // LightData* selectedLightData = nullptr;
+// #########################################  End Data1  ########################################
+
+   
+   
 
     namespace fs = std::filesystem;
 
@@ -216,10 +224,7 @@ bool shouldAddLight = false;
             else if (selectedData->index == 1) {
                 std::cout << "You can't delete the Sun silly!!" << std::endl;
             }
-            /*else {
-                std::cout << "Invalid index!" << std::endl;
-            }*/
-            
+                        
         }
 
 
@@ -643,8 +648,10 @@ bool shouldAddLight = false;
                 }
                 //   ####################################### Lighting Lab #################################
                
+
                     if (ImGui::BeginTabItem("Lighting Lab"))
                     {
+                  
                        
                         ImGui::Text("ID: Light Lab");
                         ImGui::Text("Spidex Engine New Light Lab", nullptr);
@@ -682,8 +689,44 @@ bool shouldAddLight = false;
                                 }
 
                                 if (nodeOpen) {
-                                    // Add child nodes or additional information here if needed
+                                    this->onRightClick();
+
+                                    if (ImGui::IsItemHovered()) {
+
+                                        // this->nodeButtons();
+                                         // Perform actions when the node is hovered
+                                        ImGui::SetTooltip("Right click to Edit %s", data.name.c_str());
+                                    }
+
+                                    if (ImGui::BeginPopup("NodePopup")) {
+                                        ImGui::TextColored(COLOR_LIGHTBLUE, ICON_FA_EDIT "  Entity");
+                                        ImGui::Separator();
+
+                                        if (ImGui::Selectable(ICON_FA_PEN_ALT " Edit")) {
+                                            //selectedData = &data;
+                                            strncpy_s(nameBuffer, data.name.c_str(), sizeof(nameBuffer));
+                                            nameBuffer[sizeof(nameBuffer) - 1] = '\0'; // ensure null-termination
+                                            //this->showObjectEditor = true;
+                                        }
+
+                                        if (ImGui::Selectable(ICON_FA_PLUS " New")) {
+                                            // Not sure yet
+                                        }
+                                        
+
+                                        if (ImGui::Selectable(ICON_FA_TRASH_ALT " Delete")) {
+                                            //selectedData = &data;
+                                            //deleteObject(myVector, selectedData, currentIndex, indexCube, indexPlane, indexSphere);
+                                            //objectUpdateIndex = data.objectIdx; // The index of the cube you want to Delete
+
+                                            //shouldDeleteObject = true;
+                                        }
+
+                                        ImGui::EndPopup();
+                                    }
+
                                     ImGui::TreePop();
+                                    //ImGui::TreePop();
                                 }
                             }
 
@@ -700,7 +743,7 @@ bool shouldAddLight = false;
 
 
                         ImGui::Text("Change light color"); 
-                        ImGui::ColorEdit4("Color", amb_light); // Light colour
+                        ImGui::ColorEdit4("Color", amb_light); // change the Light colour
 
                         ImGui::EndTabItem();
 

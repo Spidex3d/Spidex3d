@@ -14,6 +14,8 @@ public:
 	
 	static Lights* Instance();
 
+	static void ImGuiLightsSetUp();
+
 	void LightSetUp();
 
 	void LightRender();

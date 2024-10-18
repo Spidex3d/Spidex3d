@@ -103,7 +103,7 @@ public:
         // will need a way to keep track of the cube index
     }
      
-    inline int defaultSphere() {
+   /* inline int defaultSphere() {
         d_SphereId = d_SphereId;
         SphereIndex = SphereIndex;
         TransformComponent trans;
@@ -113,7 +113,7 @@ public:
         }
         return SphereIndex++;
 
-    }
+    }*/
 
     //  put this in here and do the same for other control panels
     void GuiEntityPanel(GLFWwindow* window) {

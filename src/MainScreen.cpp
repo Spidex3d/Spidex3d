@@ -541,6 +541,10 @@ void MainScreen::BgColour()
 
 }
 */
+void MainScreen::BgColour()
+{
+    glClearColor(my_color[0], my_color[1], my_color[2], 1.0f);
+}
 // get the keyboard and mouse input
 void MainScreen::Input()
 {

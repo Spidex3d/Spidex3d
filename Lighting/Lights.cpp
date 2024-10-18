@@ -8,6 +8,11 @@ Lights* Lights::Instance()
     return light;
 }
 
+ void Lights::ImGuiLightsSetUp()
+{
+    
+}
+
 void Lights::LightSetUp()
 {
     //ShaderManager::LightCubeShader->Use();
