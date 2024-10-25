@@ -10,6 +10,11 @@ so now I have lots of time to try and learn this stuff.
 my aim is to go from all but zero to making a games engine using Opengl.
 follow along and watch me make a complete fool of myself.
 
+✨ Week 16 Progerss 
+✨ Added obj models, lights and sky box
+![image_alt](https://github.com/Spidex3d/Spidex3d/blob/9634b963e2dbaf439d25b153e70e5e2b55401a9f/Readme/16_weeks_01.jpg)
+![image_alt](https://github.com/Spidex3d/Spidex3d/blob/9634b963e2dbaf439d25b153e70e5e2b55401a9f/Readme/16_weeks_02.jpg)
+
 ✨ Week 8 Progerss 
 ✨ Added a grid and some nice icons
 ![image_alt](https://github.com/Spidex3d/Spidex3d/blob/d74c5ae534c53ad8ebc647f1075ca1c0b18920a6/Readme/Grid.jpg)
