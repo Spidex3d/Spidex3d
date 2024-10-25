@@ -21,14 +21,12 @@ public:
 	bool loadOBJ(const std::string& filename);
 	void objDraw();
 
-
 private:
 	void initBuffers();
 
 	bool m_Loaded;
 	std::vector<Vertex> m_Vertices;
 	GLuint m_VBO, m_VAO;
-
 
 };
 

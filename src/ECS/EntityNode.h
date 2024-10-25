@@ -14,6 +14,7 @@
 #include "../Windows/spxWindows.h"
 #include "../Header/Textures.h"
 #include "../SkyBox/skyBox.h"
+#include "../Objects/spxObjLoader.h"
 
 
 bool gridNogrid = false;   // Show the grid or hide it
@@ -93,10 +94,33 @@ bool shouldAddLight = false;
     };
     
     Data1* selectedData = nullptr;
-// #########################################  End Data1  ########################################
+// #########################################  End Data1 Start of Obj Model loading  ########################################
+    // Store loaded models and textures
 
-   
-   
+    const int numInitialModels = 2;
+    std::vector<spxObjLoader> models;
+    std::vector<unsigned int> textures;
+    std::vector<glm::vec3> modelPositions;
+    std::vector<glm::vec3> modelScales;
+
+    glm::vec3 initialModPos[] = {
+         glm::vec3(0.0f, -0.7f, 0.0f), // floor
+         glm::vec3(-3.0f, -0.5f, -3.0f)  // robot
+         //glm::vec3(3.0f, -0.5f, 2.0f)  // bowling pin     
+         //glm::vec3(-4.5f, 0.0f, 1.0f) // wooden crate
+         //glm::vec3(-7.0f, -0.5f, 2.0f), // bunny
+
+    };
+    glm::vec3 initialModScale[] = {
+        glm::vec3(100.0f, 0.2f, 100.0f), // floor
+        glm::vec3(0.5f, 0.5f, 0.5f) // robot
+        //glm::vec3(0.1f, 0.1f, 0.1f)  // bowling pin   
+        //glm::vec3(1.0f, 1.0f, 1.0f) // wooden crate
+        //glm::vec3(0.7f, 0.7f, 0.7f), // bunny
+
+    };
+
+// #########################################  End of Obj Model loading  ########################################
 
     namespace fs = std::filesystem;
 
@@ -107,6 +131,16 @@ bool shouldAddLight = false;
 
             return component;
         }
+        // get the path for obj textures
+        std::string getTexturePath(const std::string& modelPath) {
+            std::string texturePath = modelPath;
+            size_t lastDot = texturePath.find_last_of('.');
+            if (lastDot != std::string::npos) {
+                texturePath.replace(lastDot, texturePath.length() - lastDot, ".jpg");
+            }
+            return texturePath;
+        }
+
         // get the sky folders
         std::vector<std::string> getDirectories(const std::string& path) {
             std::vector<std::string> directories;
@@ -252,6 +286,29 @@ bool shouldAddLight = false;
                 ObjectTypeID = 8;
                 myVector.push_back({ currentIndex++, "DefaultSphere_", indexSphere++, ObjectTypeID });
             }
+            //                      ##################  Load an Obj file #################
+            if (ImGui::Button("Add OBJ File")) {
+                std::string SPXModelPath = openFileDialog();
+                if (!SPXModelPath.empty()) {
+                    std::cout << "Model path selected: " << SPXModelPath << std::endl;
+
+                    spxObjLoader newModel;
+                    newModel.loadOBJ(SPXModelPath);
+                    models.push_back(newModel);
+
+                    std::string texturePath = getTexturePath(SPXModelPath);
+                    unsigned int newTexture = loadTexture(texturePath);
+                    textures.push_back(newTexture);
+                    std::cout << "Texture path selected: " << texturePath << std::endl;
+                    
+                    modelPositions.push_back(glm::vec3(0.0f, 2.0f, 0.0f)); // Default position, adjust as needed
+                    modelScales.push_back(glm::vec3(1.0f));    // Default Scale, adjust as needed
+
+                } else
+                 {
+                        std::cout << "No File selected." << std::endl;
+                 }
+            }
 
             ImGui::SeparatorText(ICON_FA_SPIDER" Scene Tree");
 
@@ -376,8 +433,7 @@ bool shouldAddLight = false;
         // ###### Properties Window
         void renderPropertiesPanel()
         //void renderPropertiesPanel(std::vector<Data1>& myVector, Data1* selectedData, int& currentIndex)
-        {
-            
+        {  
             
             // To Replace demo window
             // 4 Tabs Properties, Textures Lab, Terraine Lab, Sky Lab

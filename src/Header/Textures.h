@@ -9,8 +9,6 @@
 unsigned int loadTexture(const std::string& filePath) // use this one
 {
 
-
-
     unsigned int textureID;
 
     glGenTextures(1, &textureID);

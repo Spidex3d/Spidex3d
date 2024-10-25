@@ -31,16 +31,7 @@ public:
     std::string directory;
     bool gammaCorection;
 
-
-
-
-
-
-
-
 private:
-
-
 
 };
 

@@ -1,5 +1,8 @@
 #include "Lights.h"
 #include "../Shader/ShaderManager.h"
+#include "../Objects/spxObjLoader.h"
+
+//extern spxObjLoader lightMesh;
 
 Lights* Lights::Instance()
 {
@@ -10,13 +13,14 @@ Lights* Lights::Instance()
 
  void Lights::ImGuiLightsSetUp()
 {
+     
     
 }
 
 void Lights::LightSetUp()
 {
-    //ShaderManager::LightCubeShader->Use();
-    //ShaderManager::LightCubeShader->setMat4("view", view);
+    
+   
 
 }
 

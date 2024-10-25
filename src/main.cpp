@@ -119,52 +119,79 @@ unsigned int loadTexture(const std::string& filePath);
 
         //                       ############ OBJ loder ############     
 
-        const int numModels = 5;
-        spxObjLoader mesh[numModels];
-        unsigned int texture[numModels];
+        /*const int numModels = 5;
+        spxObjLoader M_mesh[numModels];
+        unsigned int M_texture[numModels];*/
 
-        // Load models
-        mesh[0].loadOBJ("Object_loader/models/woodcrate.obj");
-        mesh[1].loadOBJ("Object_loader/models/robot.obj");
-        mesh[2].loadOBJ("Object_loader/models/floor.obj");
-        mesh[3].loadOBJ("Object_loader/models/bunny.obj");
-        mesh[4].loadOBJ("Object_loader/models/bowling_pin.obj");
+        // add a light mesh on need for a texture    
+        
 
-        // Load textures
-        texture[0] = loadTexture("Object_loader/models/woodcrate_diffuse.jpg");
-        texture[1] = loadTexture("Object_loader/models/robot_diffuse.jpg");
-        texture[2] = loadTexture("Object_loader/models/tile_floor.jpg");
-        texture[3] = loadTexture("Object_loader/models/bunny_diffuse.jpg");
-        //texture[4] = loadTexture("Object_loader/models/AMF.tga"); // bowling pin with .tga big file
-        texture[4] = loadTexture("Object_loader/models/Pin.jpg");  // bowling pin with .jpg small file
-        // add a light mesh on need for a texture
+
+        unsigned int M_texture[numInitialModels];
+        spxObjLoader M_mesh[numInitialModels];
+
         spxObjLoader lightMesh;
-        lightMesh.loadOBJ("Object_loader/models/light.obj");
+        lightMesh.loadOBJ("Lighting/Light_Obj/light.obj");
 
-        //############################## Assimp Test ####################################
-        //Assimp::Importer imp;
-        //############################## End Assimp Test #####################################
+        // Load models M_mesh = obj file
+        M_mesh[0].loadOBJ("Models/floor.obj");
+        M_mesh[1].loadOBJ("Models/robot.obj");  
+        //M_mesh[2].loadOBJ("Object_loader/models/bowling_pin.obj");
+        //M_mesh[3].loadOBJ("Object_loader/models/woodcrate.obj");
+        //M_mesh[3].loadOBJ("Object_loader/models/bunny.obj");
 
-        glm::vec3 modPos[] = {
-            glm::vec3(-4.5f, 0.5f, 1.0f), // wooden crate
-            glm::vec3(-2.0f, -0.5f, -3.0f),  // robot
-            glm::vec3(0.0f, -0.5f, 0.0f), // floor
-            glm::vec3(-7.0f, -0.5f, 2.0f), // bunny
-            glm::vec3(3.0f, -0.5f, 2.0f)  // bowling pin
+        
+        // Load textures M_texture = obj texture
+        M_texture[0] = loadTexture("Models/floor.jpg");
+        M_texture[1] = loadTexture("Models/robot.jpg");
+        //M_texture[2] = loadTexture("Object_loader/models/bowling_pin.jpg");  // bowling pin with .jpg small file
+        //M_texture[3] = loadTexture("Object_loader/models/woodcrate.jpg");
+        //M_texture[3] = loadTexture("Object_loader/models/bunny.jpg");
+        //M_texture[4] = loadTexture("Object_loader/models/AMF.tga"); // bowling pin with .tga big file
+        
+       
+        //glm::vec3 modPos[] = {
+        //    glm::vec3(-4.5f, 0.5f, 1.0f), // wooden crate
+        //    glm::vec3(-2.0f, -0.5f, -3.0f),  // robot
+        //    glm::vec3(0.0f, -0.5f, 0.0f), // floor
+        //    glm::vec3(-7.0f, -0.5f, 2.0f), // bunny
+        //    glm::vec3(3.0f, -0.5f, 2.0f)  // bowling pin
 
-        };
-        glm::vec3 modScale[] = {
-            glm::vec3(1.0f, 1.0f, 1.0f), // wooden crate
-            glm::vec3(1.0f, 1.0f, 1.0f), // robot
-            glm::vec3(20.0f, 0.5f, 20.0f), // floor
-            glm::vec3(0.7f, 0.7f, 0.7f), // bunny
-            glm::vec3(0.1f, 0.1f, 0.1f)  // bowling pin
+        //};
+        //glm::vec3 modScale[] = {
+        //    glm::vec3(1.0f, 1.0f, 1.0f), // wooden crate
+        //    glm::vec3(1.0f, 1.0f, 1.0f), // robot
+        //    glm::vec3(20.0f, 0.5f, 20.0f), // floor
+        //    glm::vec3(0.7f, 0.7f, 0.7f), // bunny
+        //    glm::vec3(0.1f, 0.1f, 0.1f)  // bowling pin
 
-        };
+        //};        
 
+        // Add initial models to vectors
+        for (int i = 0; i < numInitialModels; ++i) {  
+            models.push_back(M_mesh[i]);
+            textures.push_back(M_texture[i]);
+            modelPositions.push_back(initialModPos[i]);
+            modelScales.push_back(initialModScale[i]);
+        }
+        //for (int i = 0; i < numInitialModels; ++i) {
+        ////for (int i = 0; i < 1; ++i) {
+        //    if (i >= numInitialModels || i < 0) {
+        //        std::cerr << "Index out of bounds: " << i << std::endl;
+        //        continue;
+        //    }
+        //    models.push_back(M_mesh[i]);
+        //    textures.push_back(M_texture[i]);
+        //    modelPositions.push_back(initialModPos[i]);
+        //    modelScales.push_back(initialModScale[i]);
 
+        //    std::cout << "Loaded model at index: " << i << std::endl;
+        //}
+
+ 
         glEnable(GL_DEPTH_TEST);
-        //Creat_FrameBuffer(); which draws the image it to the imgui windoe
+       
+        //Creat_FrameBuffer(); which draws the image in to the main imgui window
         MainScreen::Instance()->Creat_FrameBuffer();
         //############################################ Picking ########################################
 
@@ -212,11 +239,8 @@ unsigned int loadTexture(const std::string& filePath);
            glm::vec3(0.0f, 2.0f, 3.0f)
          };
              
-
-
-
              // do the while loop here
-
+         
         while (!glfwWindowShouldClose(windowManager.GetWindow()))
         {
 
@@ -261,8 +285,6 @@ unsigned int loadTexture(const std::string& filePath);
 
             // ############################### Lighting ###############################
            // App::Instance()->AppRuning();
-
-
 
             int numLights = sizeof(lightPos) / sizeof(lightPos[0]);
 
@@ -312,18 +334,34 @@ unsigned int loadTexture(const std::string& filePath);
             defaultCube::Instance()->draw();
 
             // ######################################### END Default Cube #######################################
-            //             ################### draw obj mesh ###################
-            for (int i = 0; i < numModels; i++)
-            {
-                model = glm::translate(glm::mat4(1.0f), modPos[i]) * glm::scale(glm::mat4(1.0f), modScale[i]);
-                ShaderManager::LightCubeShader->setMat4("model", model);
-                glBindTexture(GL_TEXTURE_2D, texture[i]);
-                mesh[i].objDraw();
-                glBindTexture(texture[i], 0);
-            }
-            //Lights::Instance()->LightSetUp();
+            //             ################### draw all obj Model mesh ###################
+            //for (int i = 0; i < numModels; i++)
 
-           
+            //ShaderManager::LightCubeShader->Use();
+            for (size_t i = 0; i < models.size(); ++i)
+            
+            {
+                //model = glm::translate(glm::mat4(1.0f), modPos[i]) * glm::scale(glm::mat4(1.0f), modScale[i]);
+                //glm::mat4 model = glm::translate(glm::mat4(1.0f), modelPositions[i]) * glm::scale(glm::mat4(1.0f), modelScales[i]);
+                model = glm::translate(glm::mat4(1.0f), modelPositions[i]) * glm::scale(glm::mat4(1.0f), modelScales[i]);
+                ShaderManager::LightCubeShader->setMat4("model", model);
+                //glBindTexture(GL_TEXTURE_2D, M_texture[i]);
+                glBindTexture(GL_TEXTURE_2D, textures[i]);
+
+                // Debugging: check if the texture and model are correctly bound
+                //std::cout << "Drawing model at index " << i << " with texture ID " << textures[i] << std::endl;
+               // M_mesh[i].objDraw();
+                models[i].objDraw();
+                //glBindTexture(M_texture[i], 0);
+               // glBindTexture(GL_TEXTURE_2D, 0);
+                glBindVertexArray(0);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                glBindTexture(GL_TEXTURE_2D, 0);
+
+            }
+            // ######################################### END Obj model Rendering #######################################
+                      
 
             ShaderManager::LightCubeShader->Use();
             ShaderManager::LightCubeShader->setMat4("view", view);
@@ -342,16 +380,13 @@ unsigned int loadTexture(const std::string& filePath);
             if (numLightsLoc != -1) {
                 glUniform1i(numLightsLoc, numLights);
             }
-
-
-                
+               
 
                  //                           ### Light OBJ mesh ######   
             if (shouldAddLight) {
 
                 LightId = myLights.size(); //new light ID
                 LightData newLight; 
-
 
                     for (int i = 0; i < numLights; i++) {
 
@@ -365,7 +400,7 @@ unsigned int loadTexture(const std::string& filePath);
                         ShaderManager::LightBulbShader->setMat4("projection", projection);
                         lightMesh.objDraw();
                     }
-                }
+            }
                     
                 //###################################### Test Render 10 multiple cubes Start ###############################
 
@@ -485,6 +520,7 @@ unsigned int loadTexture(const std::string& filePath);
                     glBindTexture(GL_TEXTURE_2D, cube.textureID);// so we know which cube has which texture
                     //std::cout << "Rendering cube with texture ID: " << cube.textureID << std::endl;
                     defaultCube::Instance()->draw();
+                    glBindTexture(GL_TEXTURE_2D, 0);
                 }
 
                 //######################### End Draw new cube on button click #############################
