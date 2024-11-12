@@ -534,17 +534,13 @@ void MainScreen::ShutDown()
 
     LogInternals::Instance()->Info("Engine shutdown successfully");
 }
-/*
+
 void MainScreen::BgColour()
 {
-    glClearColor(my_color[0], my_color[1], my_color[2], 1.0f);
+    glClearColor(0.0f,0.0f,0.0f, 1.0f); // main window background colour
 
 }
-*/
-void MainScreen::BgColour()
-{
-    glClearColor(my_color[0], my_color[1], my_color[2], 1.0f);
-}
+
 // get the keyboard and mouse input
 void MainScreen::Input()
 {

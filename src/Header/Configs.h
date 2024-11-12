@@ -10,6 +10,22 @@
 const int SCR_WIDTH = 1920;
 const int SCR_HEIGHT = 1080;
 
+// List of the Objects
+const int OBJ_CAMERA = 0; // Main Camera
+const int OBJ_LIGHT_0 = 1;
+const int OBJ_LIGHT_1 = 2;
+const int OBJ_LIGHT_2 = 3;
+const int OBJ_CUBE = 4;
+const int OBJ_PLANE = 5;
+const int OBJ_TUBE = 6;
+const int OBJ_SPHERE = 7;
+const int OBJ_TORUS = 8;
+const int OBJ_PYRAMID = 9;
+const int OBJ_OBJ_MODELS = 20;
+const int OBJ_SKY_BOX = 30;
+const int OBJ_TERRAIN = 35;
+const int OBJ_WATER = 40;
+
 
 
 enum FontIndex : int {

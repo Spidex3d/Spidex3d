@@ -24,7 +24,7 @@
     <ProjectGuid>{445765c0-825e-4009-97e8-74be70906f4a}</ProjectGuid>
     <RootNamespace>Spidex3d</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Spidex3d</ProjectName>
+    <ProjectName>Spidex3d_lighting</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -175,7 +175,6 @@
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\ECS\EntityNode.h" />
     <ClInclude Include="src\ECS\ObjectSelection.h" />
-    <ClInclude Include="src\ECS\SolidComponents.h" />
     <ClInclude Include="src\Header\Buttons.h" />
     <ClInclude Include="src\Header\FileManager.h" />
     <ClInclude Include="Shader\Shader.h" />

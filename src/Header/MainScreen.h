@@ -92,7 +92,7 @@ private:
 	//std::filesystem::path  m_CurrentDirectory;
 
 
-	float my_color[3] = { 0.0f, 0.0f, 0.0f };
+	//float my_color[3] = { 0.0f, 0.0f, 0.0f };
 
 	bool show_demo_window = false;
 	bool show_another_window = false;
