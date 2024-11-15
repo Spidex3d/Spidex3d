@@ -61,6 +61,7 @@ struct GameData { // change from Data1, This is now the main Data for all object
 
 GameData* selectedData = nullptr;
 
+
 // #########################################  Lighting ########################################
 float ambient_factor[1] = { 0.1f };
 float amb_light[4] = {
@@ -70,24 +71,17 @@ float move_light[3] = {
     0.0f, 1.0f, 6.0f
 };
 
-struct Lights1 {
-    glm::vec3 position;
-    glm::mat4 model;
-    glm::vec3 scale;
-};
-
-//std::vector<Lights1> myLights;
-
 struct LightData {
-    int currentLightIndex;
-    std::string name;
+    //int currentLightIndex;
+    //std::string name;
     int LightIndex;
     int LightType; // Sun, Ambient, Spot
 };
 
-int currentLightIndex = 0;
+//int currentLightIndex = 0;
 int LightIndex = 0;
-int LightTypeID = 0;
+
+bool lightingTest = false;
 
 LightData* selectedLightData = nullptr;
 bool shouldAddLight = false;
@@ -323,14 +317,13 @@ std::vector<LightData> myLights;
                 ImGui::Begin(ICON_FA_OBJECT_GROUP" Dynamic Spidex Object Management system");
                 ImGui::Checkbox("Rotate Cube", &rotateCube); // make the cube rotate
 
-                if (addStartUpObject) { // set up the startup Camera and and default objects
+                if (addStartUpObject) { // set up the startup Camera and and default cube, light
                     ObjectTypeID = OBJ_CAMERA;
-                    //myVector.push_back({ currentIndex++, ICON_FA_VIDEO" Main Camera", indexCube++, ObjectTypeID });
                     myVector.push_back({ currentIndex++, ICON_FA_VIDEO" Main Camera", OBJ_CAMERA, ObjectTypeID });
                     ObjectTypeID = OBJ_CUBE;
-                    myVector.push_back({ currentIndex++, ICON_FA_CUBE" DefaultCube_", indexCube++, ObjectTypeID });
+                    myVector.push_back({ currentIndex++, ICON_FA_CUBE" DefaultCube_", indexCube++, OBJ_CUBE });
                     ObjectTypeID = OBJ_LIGHT_0;
-                    myVector.push_back({ currentIndex++, ICON_FA_CUBE" DefaultLight_", indexLight++, ObjectTypeID });
+                    myVector.push_back({ currentIndex++, ICON_FA_CUBE" DefaultLight_", indexLight++, OBJ_LIGHT_0 });
 
                 }
 
@@ -338,51 +331,51 @@ std::vector<LightData> myLights;
                 if (ImGui::Button(ICON_FA_CUBE" Add Cube    ")) {
                     ObjectTypeID = OBJ_CUBE; // Cube
 
-                    myVector.push_back({ currentIndex++, ICON_FA_CUBE" DefaultCube_", indexCube++, ObjectTypeID });
+                    myVector.push_back({ currentIndex++, ICON_FA_CUBE" DefaultCube_", indexCube++, OBJ_CUBE });
 
                     shouldAddCube = true;
                 }
                 ImGui::SameLine();
                 if (ImGui::Button(ICON_FA_LIGHTBULB " Add Light   ")) {
                     ObjectTypeID = OBJ_LIGHT_0; // Light
-                    myVector.push_back({ currentIndex++, ICON_FA_LIGHTBULB" DefaultLight_", indexLight++, ObjectTypeID });
-                   // myLights.push_back({ currentLightIndex, " Default_Light", LightIndex++, LightTypeID });
+                    myVector.push_back({ currentIndex++, ICON_FA_LIGHTBULB" DefaultLight_", indexLight++, OBJ_LIGHT_0 });
                     shouldAddLight = true;
                 }
 
                 if (ImGui::Button(ICON_FA_H_SQUARE " Add Plane   ")) {
-                    ObjectTypeID = 5; // Plane
-                    myVector.push_back({ currentIndex++, "DefaultPlane_", indexPlane++, ObjectTypeID });
+                    ObjectTypeID = OBJ_PLANE; // Plane
+                    myVector.push_back({ currentIndex++, "DefaultPlane_", indexPlane++, OBJ_PLANE });
                 }
 
                 if (ImGui::Button(ICON_FA_PLUS_CIRCLE" Add Sphere ")) {
-                    ObjectTypeID = 7; // Sphere
-                    myVector.push_back({ currentIndex++, "DefaultSphere_", indexSphere++, ObjectTypeID });
+                    ObjectTypeID = OBJ_SPHERE; // Sphere
+                    myVector.push_back({ currentIndex++, "DefaultSphere_", indexSphere++, OBJ_SPHERE });
                 }
                 //                      ##################  Load an Obj file #################
                 if (ImGui::Button(ICON_FA_ROBOT " Add OBJ File")) {
-                    ObjectTypeID = 20; // obj files
+                    ObjectTypeID = OBJ_OBJ_MODEL; // obj files
                     std::string SPXModelPath = openFileDialog();
                     if (!SPXModelPath.empty()) {
                         std::cout << "Model path selected: " << SPXModelPath << std::endl;
 
-                        spxObjLoader newModel;
-                        newModel.loadOBJ(SPXModelPath);
-                        models.push_back(newModel);
+                    //    spxObjLoader newModel;
+                    //    newModel.loadOBJ(SPXModelPath);
+                    //    models.push_back(newModel);
 
-                        std::string texturePath = getTexturePath(SPXModelPath);
-                        unsigned int newTexture = loadTexture(texturePath);
-                        textures.push_back(newTexture);
-                        std::cout << "Texture path selected: " << texturePath << std::endl;
+                    //    std::string texturePath = getTexturePath(SPXModelPath);
+                    //    unsigned int newTexture = loadTexture(texturePath);
+                    //    textures.push_back(newTexture);
+                    //    std::cout << "Texture path selected: " << texturePath << std::endl;
 
-                        modelPositions.push_back(glm::vec3(0.0f, 2.0f, 0.0f)); // Default position, adjust as needed
-                        modelScales.push_back(glm::vec3(1.0f));    // Default Scale, adjust as needed
+                    //    modelPositions.push_back(glm::vec3(0.0f, 2.0f, 0.0f)); // Default position, adjust as needed
+                    //    modelScales.push_back(glm::vec3(1.0f));    // Default Scale, adjust as needed
 
                     }
                     else
                     {
                         std::cout << "No File selected." << std::endl;
                     }
+                    myVector.push_back({ currentIndex++, ICON_FA_ROBOT" Obj_Model_", indexSphere++, OBJ_OBJ_MODEL });
                 }
 
 
@@ -402,11 +395,38 @@ std::vector<LightData> myLights;
 
                         if (ImGui::IsItemClicked()) {
                             selectedData = &data;
+                                                       
+
+                            switch (data.ObjectTypeID) { // select which editor we need
+                            case 0: // Main camera
+                                lightingTest = false;
+                                std::cout << " you selected the Camera " << data.ObjectTypeID << std::endl;
+                                break;
+                            case 1: // Default Global Light
+                                lightingTest = true;
+                                std::cout << " you selected the Light1 " << data.ObjectTypeID << std::endl;
+                                break;
+                            case 2: // Ambiant Light
+
+                                std::cout << " you selected the Light2 " << data.ObjectTypeID << std::endl;
+                                break;
+                            case 3: // Point Light
+                                std::cout << " you selected the Light3 " << data.ObjectTypeID << std::endl;
+                                break;
+                            case 4: // Cube
+                                lightingTest = false;
+                                std::cout << " you selected the Light3 " << data.ObjectTypeID << std::endl;
+                               // this->showObjectEditor = true;
+                                break;
+
+                            default:
+                                break;
+                            }
 
                         }
 
                         if (nodeOpen) {
-                            this->onRightClick();
+                            // this->onRightClick();
 
                             if (ImGui::IsItemHovered()) {
 
@@ -415,6 +435,7 @@ std::vector<LightData> myLights;
                                 ImGui::SetTooltip("Right click to Edit %s", data.objectName.c_str());
                             }
 
+                            
                             if (ImGui::BeginPopup("NodePopup")) {
                                 ImGui::TextColored(COLOR_LIGHTBLUE, ICON_FA_EDIT "  Entity");
                                 ImGui::Separator();
@@ -433,6 +454,7 @@ std::vector<LightData> myLights;
                                         std::cout << " you selected the Light1 " << data.ObjectTypeID << std::endl;
                                         break;
                                     case 2: // Ambiant Light
+                                        
                                         std::cout << " you selected the Light2 " << data.ObjectTypeID << std::endl;
                                         break;
                                     case 3: // Point Light
@@ -477,99 +499,50 @@ std::vector<LightData> myLights;
                     renderObjectEditor(selectedData, showObjectEditor); // Render the name editor window
                 }
                 if (showLightEditor) {
-                    renderLightEditor(selectedData, showLightEditor); // Render the light editor window
+                    //renderLightEditor(selectedData, showLightEditor); // Render the light editor window
+                    //lightingTest = true;
                 }
+                /*if (int test = 1) {
 
-                ImGui::End();
-            }
-            // ######################################### Camera #####################################
-            void renderCameraUI(std::vector<Camera1>&myCamera, std::string & name, int& camId)
-            {
+                    lightingTest = true;
+                }*/
 
-                ImGui::Begin(ICON_FA_VIDEO" Camera");
-                // cameras types perspective, top down left, right, first person ie; player
-
-                if (!cameraAdded) { // Default Camera
-                    camId = 1;
-                    myCamera.push_back({ name, camId }); // EntityID = 4
-                    cameraAdded = true;
-                }
-                auto flags = ROOT_SELECTED_FLAGS;
-                if (ImGui::TreeNodeEx(ICON_FA_STREET_VIEW" Spidex Camera", flags))
-                {
-
-                    /*if (is_selected)
-                        node_flags |= ImGuiTreeNodeFlags_Selected;*/
-
-                    for (auto& data : myCamera) {
-                        ImGuiTreeNodeFlags nodeFlags = flags | (selectedCamData == &data ? ImGuiTreeNodeFlags_Selected : 0);
-                        bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)data.camId, nodeFlags,
-                            " Camera: %s : %d ",
-                            data.name.c_str(), data.camId);
-
-                        if (ImGui::IsItemClicked()) {
-                            selectedCamData = &data;
-                            //objectUpdateIndex = data.objectIndex;
-                            //objectUpdateIndex = selectedData->objectIndex;
-                           // cubeIndex = data.objectIndex; // get the index of the cube selected
-                            //shouldMoveCube = true; // set the move cube
-                            //cubeIndexTM = data.objectIndex; // The index of the cube you want to move
-                            //std::cout << " you did it " << data.objectIndex << std::endl;
-                        }
-                        ImGui::TreePop();
-
-                    }
-                    ImGui::TreePop();
-                }
+                
 
                 ImGui::End();
             }
 
+            void renderProperties(std::vector<GameData>& myVector, int& currentIndex,
+                int& indexCube, int& indexPlane, int& indexSphere, int& indexLight, int ObjectTypeID) { // new one
 
-
-            // ###### Properties Window
-            void renderPropertiesPanel()
-                //void renderPropertiesPanel(std::vector<GameData>& myVector, GameData* selectedData, int& currentIndex)
-            {
-
-                // To Replace demo window
-                // 4 Tabs Properties, Textures Lab, Terraine Lab, Sky Lab
-                ImGui::Begin(ICON_FA_CUBES" Properties", nullptr);
-
+                ImGui::Begin(ICON_FA_CUBES" Properties");
                 if (ImGui::BeginTabBar("##Main", ImGuiTabBarFlags_None))
                 {
-                    if (ImGui::BeginTabItem("Property Lab"))
+                    
+                    if (ImGui::BeginTabItem("Properties"))
                     {
+
+                        ImGui::SeparatorText(ICON_FA_SPIDER" Settings");
                         if (selectedData) {
-                            ImGui::InputText("Selected objectName", selectedData->objectName.data(), selectedData->objectName.size());
+                            ImGui::InputText("Object Name", selectedData->objectName.data(), selectedData->objectName.size());
+                            
                         }
                         else {
                             ImGui::Text("No data selected");
                         }
 
+                        if (ImGui::Button("Update Object")) {
+                            selectedData->objectName = nameBuffer;
+                            shouldUpdateObject = true;
+                            objectUpdateIndex = selectedData->objectIndex; // Ensure this is set correctly
+                            std::cout << "Object update index set to: " << objectUpdateIndex << std::endl;
+                            //showObjectEditor = false;
+                        }
+
                         ImGui::Text("ID: Textures");
                         ImGui::Text("Spidex Engine Textures", nullptr);
-                        /*ImGui::Text("pointer = %x", texture_image_id);
-                        ImGui::Text("Size = %d x %d", tex_image_width, tex_image_height);*/
 
                         ImGui::Spacing();
-                        // ################################# File ###########################
-
-                       /* Utility::Instance()->getDirectoryFiles();
-                        Utility::Instance()->Initialize();*/
-
-
-                        // ################################# End File ###########################
-
-                       // I need to loop thought all images in the texture folder
-                          //int ret = LoadTextureFiles("Textures/github.jpg", &texture_image_id, tex_image_width, tex_image_height);
-
-                        // ######################## Show the texture
-
-                          //ImVec2 pos = ImGui::GetCursorScreenPos();
-
-                          //ImGui::GetWindowDrawList()->AddImage((void*)texture_image_id, ImVec2(pos.x, pos.y),
-                          //ImVec2(pos.x + 100, pos.y + 100), ImVec2(0, 1), ImVec2(1, 0));
 
                         //#########################
                         ImGui::SeparatorText(ICON_FA_SPIDER" Settings");
@@ -588,7 +561,7 @@ std::vector<LightData> myLights;
 
                             ImGui::BeginTable("Test Table", 2, flags);
 
-                            bool test = true;
+                            
 
                             ImGui::TableNextColumn();
                             ImGui::TextUnformatted("Object Name");
@@ -610,7 +583,7 @@ std::vector<LightData> myLights;
                             ImGui::TextUnformatted("Hide Object");
                             ImGui::TableNextColumn();
 
-                            if (ImGui::Checkbox("##test", &test)) {
+                            if (ImGui::Checkbox("##test", &hideObject)) {
                                 // do somthing
                             }
 
@@ -623,59 +596,104 @@ std::vector<LightData> myLights;
                             ImGui::BeginTable("Test Table", 1, ImGuiTableFlags_Reorderable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders);
 
                             ImGui::TableNextColumn();
-                            ImGui::Text("Position:  ");
+                            
                             ImGui::SameLine();
                             if (ImGui::Button("Reset")) {
                                 pos_val[0] = 0.0f, pos_val[1] = 0.0f, pos_val[2] = 2.0f;
-                            }// Reset to 0,0,0
+                            }
                             ImGui::SameLine();
-                            ImGui::DragFloat3("##pos", pos_val, 1.0f, 1.0f, 2.0f);
+                            
+                            ImGui::DragFloat3("Position",pos_val, 1.0f, 1.0f, 2.0f);
                             ImGui::TableNextRow();
                             ImGui::TableNextColumn();
-                            ImGui::Text("Rotation:  ");
+                           
                             ImGui::SameLine();
                             if (ImGui::Button("Reset")) {
                                 rot_val[0] = 0.0f, rot_val[1] = 0.0f, rot_val[2] = 0.0f;
                             }
                             ImGui::SameLine();
-                            ImGui::DragFloat3("##Rot", rot_val, 1.0f, 1.0f, 1.0f);
+                            ImGui::DragFloat3("Rotation", rot_val, 1.0f, 1.0f, 1.0f);
 
                             ImGui::TableNextRow();
                             ImGui::TableNextColumn();
-                            ImGui::Text("Scale:       ");
+                            
                             ImGui::SameLine();
-                            if (ImGui::Button("SReset")) {
+                            if (ImGui::Button("Reset")) {
                                 scale_val[0] = 1.0f, scale_val[1] = 1.0f, scale_val[2] = 1.0f;
                             }// 1,1,1
                             ImGui::SameLine();
-                            ImGui::DragFloat3("##Scale", scale_val, 1.0f, 1.0f, 1.0f);
+                            ImGui::DragFloat3("Scale", scale_val, 1.0f, 1.0f, 1.0f);
 
                             //ImGui::Selectable(label, &selected);
 
                             ImGui::EndTable();
 
                         }
-                        ImGui::Checkbox("Hide Grid", &gridNogrid); // make the cube rotate
+                                                // ##### TEXTURE #####
+                        if (ImGui::CollapsingHeader(ICON_FA_PHOTO_VIDEO" Texture", ImGuiTreeNodeFlags_DefaultOpen))
+                        {
+                            if (ImGui::Button("Set New Texture")) {
+                                std::string myTexturePath = openFileDialog();
+                                if (!myTexturePath.empty()) {
+                                    std::cout << "Texture path selected: " << myTexturePath << std::endl;
+                                    objectUpdateIndex = selectedData->objectIndex; // just added
+                                    if (objectUpdateIndex != -1) {
+                                        std::cout << "Updating texture for cube index: " << objectUpdateIndex << std::endl;
+                                        myObject[objectUpdateIndex].textureID = loadTexture(myTexturePath);
+                                        std::cout << "New texture ID: " << myObject[objectUpdateIndex].textureID << std::endl;
 
+                                        crateMap = loadTexture((myTexturePath).c_str());
+
+                                    }
+                                    else {
+                                        std::cout << "objectUpdateIndex is not set correctly." << std::endl;
+                                    }
+                                }
+                                else {
+                                    std::cout << "No texture path selected." << std::endl;
+                                }
+                            }
+                            if (crateMap != 0) {
+                                ImGui::Text("Here is your texture:");
+
+                                ImGui::Image((void*)(intptr_t)crateMap, ImVec2(65, 65)); // show image selected
+
+                            }
+                            else {
+                                ImGui::Text("No texture loaded.");
+                            }
+                            
+                        }
+                                            // ##### LIGHTING #####
+                        if (lightingTest) { 
+                            if (ImGui::CollapsingHeader(ICON_FA_LIGHTBULB" Lighting", ImGuiTreeNodeFlags_DefaultOpen))
+                            {
+                                
+                                
+                                ImGui::SeparatorText(ICON_FA_SPIDER" Light Settings");
+                                ImGui::Text("Change Ambient Factor");
+                                ImGui::DragFloat("Ambient", ambient_factor, 0.0f);
+                                ImGui::Text("Light Position");
+                                ImGui::DragFloat3("Position", move_light, 0.0f, 1.0f, 6.0f);
+                                ImGui::Text("Change light color");                         
+                            
+                                ImGui::ColorEdit4("Color", amb_light);
+                            }
+                            
+                        }
+
+                        if (ImGui::CollapsingHeader(ICON_FA_BARS" Grid", ImGuiTreeNodeFlags_DefaultOpen))
+                        {
+                            ImGui::Checkbox("Hide Grid", &gridNogrid); // make the cube rotate
+                        }
                         ImGui::EndChild();
 
                         ImGui::EndTabItem();
 
-
                     }
+
                     if (ImGui::BeginTabItem("Sky Lab"))
                     {
-                        /*std::string path = "Textures/skybox";
-
-                        std::vector<std::string> directories = getDirectories(path);
-
-                        std::cout << "Directories in " << path << ":\n";
-                        for (const auto& dir : directories) {
-                            std::cout << dir << std::endl;
-                        }*/
-
-
-
                         ImGui::Text("ID: Sky Lab"); // ###################  Sky Lab ##############
 
                         // add a selection of skys to pick from maybe a folder or an image showing the type sky
@@ -772,16 +790,8 @@ std::vector<LightData> myLights;
                             skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
                             addSky = true;
                         }
-                        /*for (int i = 0; i < 3; ++i) {
-                            ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset());
-                            if (ImGui::ImageButton((void*)(intptr_t)crateMap, ImVec2(135, 135))) {
-                                addSky = true;
-                            }
-                            ImGui::NextColumn();
-                        }*/
-
+                        
                         ImGui::EndColumns();
-
 
                         ImGui::Text("Spidex Engine New Sky Lab! well its a start", nullptr);
 
@@ -794,117 +804,17 @@ std::vector<LightData> myLights;
                         if (ImGui::Button("Remove a Sky")) {
                             addSky = false;
                         }
-
-
                         ImGui::EndTabItem();
                     }
-
-
-                    // ################################ Lighting Lab ########################                 
-
-                    if (ImGui::BeginTabItem("Lighting Lab"))
+                    if (ImGui::BeginTabItem("Particel Lab"))
                     {
-
-                        ImGui::Text("ID: Light Lab");
-                        ImGui::Text("Spidex Engine New Light Lab", nullptr);
-
-                        if (ImGui::Button("Add Light"))
-                        {
-
-                            // myLights.push_back({ " Default_Light", LightId++, LightTypeID });
-                             /*myLights.push_back({ currentLightIndex, " Default_Light", LightIndex++, LightTypeID });
-                             shouldAddLight = true;*/
-                        }
-
-                        ImGui::SeparatorText(ICON_FA_SPIDER" Lights in Scean");
-
-                        auto flags = ROOT_SELECTED_FLAGS;
-                        if (ImGui::TreeNodeEx(ICON_FA_STREET_VIEW" Spidex Lights", flags))
-                        {
-
-                            static bool align_label_with_current_x_position = false;
-                            static bool test_drag_and_drop = false;
-
-                            if (align_label_with_current_x_position)
-                                ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
-
-                            static int selection_mask = (1 << 2);
-                            int node_clicked = -1;
-
-                            for (auto& data : myLights) {
-                                ImGuiTreeNodeFlags nodeFlags = flags | (selectedLightData == &data ? ImGuiTreeNodeFlags_Selected : 0);
-                                bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)data.LightIndex, nodeFlags,
-                                    " Lights: %s : %d : %d ",
-                                    data.name.c_str(), data.LightIndex, data.LightType);
-
-                                if (ImGui::IsItemClicked()) {
-                                    selectedLightData = &data;
-                                    // Handle selection logic here
-                                }
-
-                                if (nodeOpen) {
-                                    this->onRightClick();
-
-                                    if (ImGui::IsItemHovered()) {
-
-                                        // this->nodeButtons();
-                                         // Perform actions when the node is hovered
-                                        ImGui::SetTooltip("Right click to Edit %s", data.name.c_str());
-                                    }
-
-                                    if (ImGui::BeginPopup("NodePopup")) {
-                                        ImGui::TextColored(COLOR_LIGHTBLUE, ICON_FA_EDIT "  Entity");
-                                        ImGui::Separator();
-
-                                        if (ImGui::Selectable(ICON_FA_PEN_ALT " Edit")) {
-                                            //selectedData = &data;
-                                            strncpy_s(nameBuffer, data.name.c_str(), sizeof(nameBuffer));
-                                            nameBuffer[sizeof(nameBuffer) - 1] = '\0'; // ensure null-termination
-                                            //this->showObjectEditor = true;
-                                        }
-
-                                        if (ImGui::Selectable(ICON_FA_PLUS " New")) {
-                                            // Not sure yet
-                                        }
-
-
-                                        if (ImGui::Selectable(ICON_FA_TRASH_ALT " Delete")) {
-                                            //selectedData = &data;
-                                            //deleteObject(myVector, selectedData, currentIndex, indexCube, indexPlane, indexSphere);
-                                            //objectUpdateIndex = data.objectIndex; // The index of the cube you want to Delete
-
-                                            //shouldDeleteObject = true;
-                                        }
-
-                                        ImGui::EndPopup();
-                                    }
-
-                                    ImGui::TreePop();
-                                    //ImGui::TreePop();
-                                }
-                            }
-
-                            ImGui::TreePop();
-                        }
-                        ImGui::SeparatorText(ICON_FA_SPIDER" Light Settings");
-                        ImGui::Text("Change Ambient Factor");
-                        ImGui::DragFloat("Ambient", ambient_factor, 0.0f);
-                        ImGui::Text("Light Position");
-                        ImGui::DragFloat3("Position", move_light, 0.0f, 1.0f, 6.0f);
-                        // ImGui::DragFloat3("Position", lighPos, 0.5f, 1.0f, 5.0f);
-                        // ImGui::DragFloat3("Position", lighPos, 0.5f, 1.0f, 5.0f);
-
-
-
-                        ImGui::Text("Change light color");
-                        ImGui::ColorEdit4("Color", amb_light); // change the Light colour
+                        ImGui::Text("ID: Particel Lab");
+                        ImGui::Text("Spidex Engine New Particel Lab", nullptr);
+                        ImGui::Button("Save");
 
                         ImGui::EndTabItem();
 
                     }
-                    // put } here
-
-
                     if (ImGui::BeginTabItem("Terraine Lab"))
                     {
                         ImGui::Text("ID: Terraine Lab");
@@ -915,13 +825,25 @@ std::vector<LightData> myLights;
 
                     }
 
-
                     ImGui::EndTabBar();
+
+
+                //if (ImGui::Button("Update Object")) {
+                //    selectedData->objectName = nameBuffer;
+                //    shouldUpdateObject = true;
+                //    objectUpdateIndex = selectedData->objectIndex; // Ensure this is set correctly
+                //    std::cout << "Object update index set to: " << objectUpdateIndex << std::endl;
+                //    //showObjectEditor = false;
+                //}
+
+                ImGui::Text("This all seemes to be working");
+
                 }
 
                 ImGui::End();
-            }
-
+            }           
+            
+            
 
     private:
         // GameData* selectedData = nullptr;      
@@ -930,10 +852,12 @@ std::vector<LightData> myLights;
         bool showLightEditor = false; // for editing lighting
         bool cameraAdded = false;
 
+        bool hideObject = false;
+
         Camera1 defaultCamera = { ICON_FA_VIDEO " MainCamera ", 0 };// maincamera with id 0       
 
         char nameBuffer[128] = ""; // for renaming the cubes
-        // std::string crateImg = "Textures/brick.jpg"; // need a way to chang this
+        
 
         
 

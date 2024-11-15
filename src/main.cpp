@@ -205,7 +205,7 @@ unsigned int loadTexture(const std::string& filePath);
         int indexSphere = 0;
         int indexLight = 0;
         int ObjectTypeID = 0;
-        int EntityID = 0; // Example EntityID obj ect; ect;
+        //int EntityID = 0; // Example EntityID obj ect; ect;
 
         float posy = 2.0f; // move the 10 cubes + 2 on the x
 
@@ -265,9 +265,10 @@ unsigned int loadTexture(const std::string& filePath);
 
             // ######################################## Render UI Vector  ##################################
              //################################### THIS IS THE NEW BIT Vector #############
-            EntityNode::Instance()->renderPropertiesPanel();
+            //EntityNode::Instance()->renderPropertiesPanel();
+            EntityNode::Instance()->renderProperties(myVector, currentIndex, indexCube, indexPlane, indexSphere, indexLight, ObjectTypeID);
             EntityNode::Instance()->renderUI(myVector, currentIndex, indexCube, indexPlane, indexSphere, indexLight, ObjectTypeID);
-            EntityNode::Instance()->renderCameraUI(myCamera, name, camId);
+            //EntityNode::Instance()->renderCameraUI(myCamera, name, camId);
 
             // ######################################## END Render UI  ########################################################          
 
@@ -303,32 +304,8 @@ unsigned int loadTexture(const std::string& filePath);
 
             MainScreen::Instance()->ClearScreen();
 
-            // ######################################### Default Cube #######################################
-            //ShaderManager::LightCubeShader->Use();
-            //ShaderManager::LightCubeShader->setMat4("projection", projection);
-            //ShaderManager::LightCubeShader->setMat4("view", view);
-            //model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-            ////model = glm::translate(model, glm::vec3(pos_val[0], pos_val[1], pos_val[2])); // cubePositions[0]);
-            //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 1.0f)); // cubePositions[0]);
-            //// if (selected) do this
-            ////model = glm::scale(model, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
-            //model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-            //if (rotateCube) {
-            //    model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(0.0f, 0.3f, 0.0f));
-            //    // model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(scale_val[0], scale_val[1], scale_val[2]));
-            //}
-            ////model = glm::rotate(model, glm::radians(45.0f), glm::vec3(rot_val[0], rot_val[1], rot_val[2]));
-
-            //ShaderManager::LightCubeShader->setMat4("model", model);
-
-            //glActiveTexture(GL_TEXTURE0);
-            //glBindTexture(GL_TEXTURE_2D, defaultMap);
-
-            //defaultCube::Instance()->draw();
-
-            // ######################################### END Default Cube #######################################
+            
             //             ################### draw all obj Model mesh ###################
-            //for (int i = 0; i < numModels; i++)
 
             ShaderManager::LightCubeShader->Use();
             for (size_t i = 0; i < models.size(); ++i)  // Robot and Floor
@@ -354,16 +331,40 @@ unsigned int loadTexture(const std::string& filePath);
 
             }
             // ######################################### END Obj model Rendering #######################################
-                      
 
+            //###################################### Render Start up Objects ###############################   
+            if (addStartUpObject) {
+                cubeIndex = myObject.size();
+
+                gameObject startUp;
+                startUp.position = glm::vec3(0.0f, 0.0f, 0.0f); // Default position 
+                startUp.scale = glm::vec3(1.0f, 1.0f, 1.0f); // Default scale
+
+                // Initialize model matrix
+                startUp.model = glm::mat4(1.0f);
+                startUp.model = glm::translate(startUp.model, startUp.position);
+                startUp.model = glm::scale(startUp.model, startUp.scale);
+                // default cube texture
+                startUp.textureID = loadTexture("Textures/default.jpg");
+                // Add the new cube to the vector or a object obj or light, Texture
+                myObject.push_back(startUp);
+
+                LightIndex = myLights.size();
+                LightData startUpLight;
+                myLights.push_back(startUpLight);
+
+                addStartUpObject = false;
+
+            }
+            //###################################### End Start up Objects ###############################   
+                      
             ShaderManager::LightCubeShader->Use();
             ShaderManager::LightCubeShader->setMat4("view", view);
             ShaderManager::LightCubeShader->setMat4("projection", projection);
             ShaderManager::LightCubeShader->setVec3("viewPos", viewPos);
             ShaderManager::LightCubeShader->setVec3("lightColor", lightColor);
             ShaderManager::LightCubeShader->setFloat("ambientFactor", ambientFactor);
-            // ShaderManager::LightCubeShader->setVec3("lightPos", lightPos);
-
+           
             GLint lightPosLoc = glGetUniformLocation(ShaderManager::LightCubeShader->ID, "lightPos");
             if (lightPosLoc != -1) {
                 glUniform3fv(lightPosLoc, numLights, &lightPos[0][0]);
@@ -375,11 +376,12 @@ unsigned int loadTexture(const std::string& filePath);
             }
                
 
-                //                           ### Light OBJ mesh ######   
+                // ############################### Add a Light OBJ mesh with a button ##########   
                 if (shouldAddLight) {
-
+                    // std::vector<LightData> myLights;
                     LightIndex = myLights.size(); //new light ID
-                    Lights1 newLight;
+                    gameObject newLight; // this was Lights1
+                        
                     
                     switch (LightIndex) {
                     case 0:
@@ -400,8 +402,12 @@ unsigned int loadTexture(const std::string& filePath);
                     newLight.model = glm::translate(newLight.model, newLight.position);
                     newLight.model = glm::scale(newLight.model, newLight.scale);
 
-                    //myLights.push_back(newLight);
+                    // myObject.push_back(newLight);
+                    shouldAddLight = false;
 
+                    std::cout << "Light Index " << LightIndex << std::endl;
+
+                }
                     for (int i = 0; i < numLights; i++) {
 
                         glm::mat4 model = glm::translate(glm::mat4(1.0f), lightPos[i]);
@@ -415,36 +421,12 @@ unsigned int loadTexture(const std::string& filePath);
                         lightMesh.objDraw();
                     }
 
-                   // shouldAddLight = false;
-                }
+                    
 
-                //###################################### Render A New cubes on button click ###############################   
                 
-                if (addStartUpObject) { // this is the start up scene
-                    cubeIndex = myObject.size();
                    
-                    gameObject startUp;   
-                    startUp.position = glm::vec3(0.0f, 0.0f, 0.0f); // Default position for any additional cubes
-                    startUp.scale = glm::vec3(1.0f, 1.0f, 1.0f); // Default scale
-                    
-                    // Initialize model matrix
-                    startUp.model = glm::mat4(1.0f);
-                    startUp.model = glm::translate(startUp.model, startUp.position);
-                    startUp.model = glm::scale(startUp.model, startUp.scale);
-                    
-                    startUp.textureID = loadTexture("Textures/default.jpg");
-                    // Add the new cube to the vector or a object obj or light, Texture
-                    myObject.push_back(startUp);
-
-                    LightIndex = myLights.size();
-                    LightData startUpLight;
-                    myLights.push_back(startUpLight);
-
-                    addStartUpObject = false;
-                    
-                    //std::cout << "Cube Index " << cubeIndex << std::endl;
-                }
-                   
+                //###################################### Render A New cubes on button click ###############################   
+                  
 
                 if (shouldAddCube) {
                     cubeIndex = myObject.size(); // Use the size of the vector to determine the next index
@@ -510,7 +492,7 @@ unsigned int loadTexture(const std::string& filePath);
                     }
                 }
 
-                if (shouldDeleteObject) {
+                if (shouldDeleteObject) { // ### NOT WORKING ###
                     if (objectUpdateIndex != -1) { // Check if a valid index is set
                         deleteCube(objectUpdateIndex);
                         objectUpdateIndex = -1; // Reset the index
@@ -536,7 +518,7 @@ unsigned int loadTexture(const std::string& filePath);
                 //######################### End Draw new cube on button click #############################
 
                  //###################################### Grid Start ###############################
-                 // app->getDefaultGridShader().Use();
+                 
                 if (!gridNogrid) {   // Show the grid or hide it
 
                     ShaderManager::defaultGridShader->Use();
@@ -575,7 +557,7 @@ unsigned int loadTexture(const std::string& filePath);
                 MainScreen::Instance()->Unbinde_Frambuffer();
 
                 // ############ ImGui Render ######################
-                MainScreen::Instance()->RenderImGui(windowManager.GetWindow()); // 5 Put them in this order
+                MainScreen::Instance()->RenderImGui(windowManager.GetWindow()); // Put them in this order this one last
 
                 glfwSwapBuffers(windowManager.GetWindow());
                 glfwPollEvents();
