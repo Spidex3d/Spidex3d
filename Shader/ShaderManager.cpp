@@ -21,7 +21,7 @@ void ShaderManager::SetupShaders() {
   
     LightBulbShader = new Shader("Shader/shaderFile/bulb.vert", "Shader/shaderFile/bulb.frag");
   
-    LightCubeShader = new Shader("Shader/shaderFile/light.vert", "Shader/shaderFile/light.frag");
+    LightCubeShader = new Shader("Shader/shaderFile/light_2.vert", "Shader/shaderFile/light_2.frag");
 
     defaultShader = new Shader("Shader/shaderFile/default.vert", "Shader/shaderFile/default.frag");
 

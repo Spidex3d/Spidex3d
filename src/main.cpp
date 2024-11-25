@@ -25,7 +25,12 @@
 #include <vector>
 #include <string>
 
-#include "../Lighting/Lights.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+#include <thread>
+
+
+//#include "../Lighting/Lights.h"
 
 #include "App.h"
 
@@ -48,13 +53,13 @@ unsigned int loadTexture(const std::string& filePath);
 
     // update cube position
     void updateCubePosition(int index, glm::vec3 newPosition, glm::vec3 newScale) {
-        if (index >= 0 && index < myObject.size()) {
-            myObject[index].position = newPosition, myObject[index].scale = newScale;
+        if (index >= 0 && index < myGameObject.size()) {
+            myGameObject[index].position = newPosition, myGameObject[index].scale = newScale;
 
             // Update the model matrix
-            myObject[index].model = glm::mat4(1.0f);
-            myObject[index].model = glm::translate(myObject[index].model, myObject[index].position);
-            myObject[index].model = glm::scale(myObject[index].model, myObject[index].scale);
+            myGameObject[index].model = glm::mat4(1.0f);
+            myGameObject[index].model = glm::translate(myGameObject[index].model, myGameObject[index].position);
+            myGameObject[index].model = glm::scale(myGameObject[index].model, myGameObject[index].scale);
         }
         else {
             std::cout << "Invalid cube index" << std::endl;
@@ -62,8 +67,8 @@ unsigned int loadTexture(const std::string& filePath);
     }
     // delete a selected cube
     void deleteCube(int index) {
-        if (index >= 0 && index < myObject.size()) {
-            myObject.erase(myObject.begin() + index);
+        if (index >= 0 && index < myGameObject.size()) {
+            myGameObject.erase(myGameObject.begin() + index);
             std::cout << "Cube at index " << index << " deleted." << std::endl;
         }
         else {
@@ -191,23 +196,21 @@ unsigned int loadTexture(const std::string& filePath);
         defaultCube newCube; // new  green cube class ################### GO TO LINE 412 ##############################
         defaultCube::Instance()->MaindefaultCube();
 
-
-        std::vector<Camera1> myCamera;
         std::string name;
         int camId = 0;
 
 
-        std::vector<GameData> myVector;
-        //Node* head = nullptr;
+        std::vector<GameData> myVector;  // this is the game Object main VECTOR ##############
+        //std::vector<LightData> myLightObject; // this is the Light object main VECTOR ##############
         int currentIndex = 0;
         int indexCube = 0;
         int indexPlane = 0;
         int indexSphere = 0;
-        int indexLight = 0;
         int ObjectTypeID = 0;
-        //int EntityID = 0; // Example EntityID obj ect; ect;
+        int indexLight = 0;
 
-        float posy = 2.0f; // move the 10 cubes + 2 on the x
+
+        float posx = 2.0f; // move the 10 cubes + 2 on the x
 
         SkyBox();
 
@@ -215,23 +218,11 @@ unsigned int loadTexture(const std::string& filePath);
 
         App::Instance()->appInIt();
         // ################################   Lighting ######################
-       
+              
+              
+        glm::vec3 lightPos; // start of light positionglm::vec3
 
-        /*std::vector<LightData> myLights;
-        int LightIndex = 1;
-        int LightTypeID = 0;*/
-
-       // myLights.push_back({ 0, ICON_FA_SUN" Ambient_Light", 0, LightTypeID });
-
-        glm::vec3 viewPos;
-       // glm::vec3 lightPos(0.0f, 1.0f, 6.0f); // start of light positionglm::vec3
-
-
-         glm::vec3 lightPos[] = {
-           glm::vec3(0.0f, 1.5f, 3.0f),
-           glm::vec3(0.0f, 2.0f, 3.0f)
-         };
-             
+                     
              // do the while loop here
          
         while (!glfwWindowShouldClose(windowManager.GetWindow()))
@@ -275,21 +266,36 @@ unsigned int loadTexture(const std::string& filePath);
             //############################# End ImGui #############################################
 
              MainScreen::Instance()->BgColour();
-             //SolidComponents::Instance()->BgColour();
-
-           // App::Instance()->AppRuning();
-
-            // ############################### Lighting ###############################
-            int numLights = sizeof(lightPos) / sizeof(lightPos[0]);
-
+             
             
-            float ambientFactor(ambient_factor[0]);
-            glm::vec3 lightColor(amb_light[0], amb_light[1], amb_light[2]);
-            //glm::vec3 lightPos[0](move_light[0], move_light[1], move_light[2]);
+            //################################ Lighting New ################################
+             float ambientFactor(ambient_factor[0]);
+             glm::vec3 lightColor(amb_light[0], amb_light[1], amb_light[2]);
+
+            ShaderManager::LightCubeShader->Use();
+            ShaderManager::LightCubeShader->setVec3("light.position", lightPos);
+            ShaderManager::LightCubeShader->setVec3("viewPos", camera.Position);
+            ShaderManager::LightCubeShader->setVec3("light.ambient", 1.8f, 1.8f, 1.8f);
+            ShaderManager::LightCubeShader->setVec3("light.diffuse", 1.5f, 1.5f, 1.5f);
+            ShaderManager::LightCubeShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+           
+            ShaderManager::LightCubeShader->setVec3("matirial.specular", 0.5f, 0.5f, 0.5f);
+            ShaderManager::LightCubeShader->setFloat("matirial.shininess", 60.0f);
+                    
+
+             
+
+            glm::vec3 viewPos;
+
+            glm::vec3 lightPos(0.0f, 1.0f, 1.0f);
+           
+            //glm::vec3 lightColor(amb_light[0], amb_light[1], amb_light[2]);
+
             angel += (float)deltaTime * 50.0f;
-            //lightPos.x = 4.0f * sinf(glm::radians(angel));
-            lightPos[0].x = 4.0f * sinf(glm::radians(angel));
-            lightPos[1].z = 4.0f * sinf(glm::radians(angel));
+            lightPos.x = 4.0f * sinf(glm::radians(angel));
+
+            // ################################## End lighting #############################
+
 
 
             // ###################################### Camera Control ########################################
@@ -334,7 +340,7 @@ unsigned int loadTexture(const std::string& filePath);
 
             //###################################### Render Start up Objects ###############################   
             if (addStartUpObject) {
-                cubeIndex = myObject.size();
+                cubeIndex = myGameObject.size();
 
                 gameObject startUp;
                 startUp.position = glm::vec3(0.0f, 0.0f, 0.0f); // Default position 
@@ -347,89 +353,120 @@ unsigned int loadTexture(const std::string& filePath);
                 // default cube texture
                 startUp.textureID = loadTexture("Textures/default.jpg");
                 // Add the new cube to the vector or a object obj or light, Texture
-                myObject.push_back(startUp);
+                myGameObject.push_back(startUp);
 
-                LightIndex = myLights.size();
-                LightData startUpLight;
-                myLights.push_back(startUpLight);
+                LightObject lightStartUp;
+                myLightObject.push_back(lightStartUp);
 
                 addStartUpObject = false;
 
             }
             //###################################### End Start up Objects ###############################   
-                      
+
             ShaderManager::LightCubeShader->Use();
             ShaderManager::LightCubeShader->setMat4("view", view);
             ShaderManager::LightCubeShader->setMat4("projection", projection);
             ShaderManager::LightCubeShader->setVec3("viewPos", viewPos);
             ShaderManager::LightCubeShader->setVec3("lightColor", lightColor);
+            ShaderManager::LightCubeShader->setVec3("lightPos", lightPos);
             ShaderManager::LightCubeShader->setFloat("ambientFactor", ambientFactor);
+
+                                  
+            
+            // ################################ Draw light obj ###############################
+           /* model = glm::translate(model = glm::mat4(1.0f), lightPos);
+            model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+            ShaderManager::LightBulbShader->Use();
            
-            GLint lightPosLoc = glGetUniformLocation(ShaderManager::LightCubeShader->ID, "lightPos");
-            if (lightPosLoc != -1) {
-                glUniform3fv(lightPosLoc, numLights, &lightPos[0][0]);
-            }
+            ShaderManager::LightBulbShader->setVec3("lightColor", amb_light[0], amb_light[1], amb_light[2]);
+            ShaderManager::LightBulbShader->setMat4("model", model);
+            ShaderManager::LightBulbShader->setMat4("view", view);
+            ShaderManager::LightBulbShader->setMat4("projection", projection);
+           
+            lightMesh.objDraw();*/
+                      
 
-            GLint numLightsLoc = glGetUniformLocation(ShaderManager::LightCubeShader->ID, "numLights");
-            if (numLightsLoc != -1) {
-                glUniform1i(numLightsLoc, numLights);
-            }
-               
-
-                // ############################### Add a Light OBJ mesh with a button ##########   
+                // ############################### Add a Light OBJ model with a button ##########   
                 if (shouldAddLight) {
-                    // std::vector<LightData> myLights;
-                    LightIndex = myLights.size(); //new light ID
-                    gameObject newLight; // this was Lights1
-                        
                     
-                    switch (LightIndex) {
+                    lightIndex = myLightObject.size();
+
+                    LightObject newLight;
+                    
+                                            
+                    switch (lightIndex) {
                     case 0:
                         // add light = 1
                         newLight.position = glm::vec3(1.0f, 2.0f, 1.0f);
                         newLight.scale = glm::vec3(0.5f, 0.5f, 0.5f);
+
+                        std::cout << "Drawing light at position: " << glm::to_string(newLight.position) << std::endl;
+                        std::cout << "Drawing light with scale of: " << glm::to_string(newLight.scale) << std::endl;
+
                         break;
                     case 1:
                         // add light = 2
-                        newLight.position = glm::vec3(1.0f, 3.0f, 1.0f);
-                        newLight.scale = glm::vec3(0.5f, 0.5f, 0.5f);
+                        newLight.position = glm::vec3(1.5f, 3.0f, 1.0f);
+                        newLight.scale = glm::vec3(1.5f, 1.5f, 1.5f);
+                        std::cout << "Drawing light at position: " << glm::to_string(newLight.position) << std::endl;
+                        std::cout << "Drawing light with scale of: " << glm::to_string(newLight.scale) << std::endl;
                         break;
 
                     default:
+                        newLight.position = glm::vec3(posx, 4.0f, 1.0f);
+                        newLight.scale = glm::vec3(1.5f, 1.5f, 1.5f);
+                        std::cout << "Drawing light at position: " << glm::to_string(newLight.position) << std::endl;
+                        std::cout << "Drawing light with scale of: " << glm::to_string(newLight.scale) << std::endl;
+                        posx += 1.5;
                         break;
                     }
                     newLight.model = glm::mat4(1.0f);
                     newLight.model = glm::translate(newLight.model, newLight.position);
                     newLight.model = glm::scale(newLight.model, newLight.scale);
 
-                    // myObject.push_back(newLight);
+                    //myGameObject.push_back(newLight); // push the light in to the vector
+                    myLightObject.push_back(newLight); // push the light in to the Lights vector
+                   
+                    std::cout << "Light Index " << lightIndex << std::endl;
+
                     shouldAddLight = false;
 
-                    std::cout << "Light Index " << LightIndex << std::endl;
-
                 }
-                    for (int i = 0; i < numLights; i++) {
 
-                        glm::mat4 model = glm::translate(glm::mat4(1.0f), lightPos[i]);
-                        // model = glm::translate(model = glm::mat4(1.0f), lightPos[i]);
-                        model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+                /*
+                model = glm::translate(model, light.position);
+                model = glm::scale(model, light.scale); 
+                */
+                    //for (auto& light : myGameObject) {
+                    for (const auto& light : myLightObject) {
+                        //glm::mat4 model = glm::translate(glm::mat4(1.0f), lightPos);
+                        glm::mat4 model = glm::translate(glm::mat4(1.0f), light.position); // new
+                        //model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+                        model = glm::scale(model, glm::vec3(light.scale));  // new
+                        //model = glm::translate(model, light.position);
+                        //model = glm::scale(model, light.scale);
                         ShaderManager::LightBulbShader->Use();
                         ShaderManager::LightBulbShader->setVec3("lightColor", amb_light[0], amb_light[1], amb_light[2]);
                         ShaderManager::LightBulbShader->setMat4("model", model);
                         ShaderManager::LightBulbShader->setMat4("view", view);
                         ShaderManager::LightBulbShader->setMat4("projection", projection);
-                        lightMesh.objDraw();
+                       
+                        //std::cout << "Drawing light at position: " << glm::to_string(light.position) << std::endl;
+                        lightMesh.objDraw(); //Just draws one the light?
+
+                       
+
                     }
 
+                    //std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                                                    
                     
-
-                
+                                  
                    
-                //###################################### Render A New cubes on button click ###############################   
-                  
+                //###################################### Render A New cubes on button click ###############################                    
 
                 if (shouldAddCube) {
-                    cubeIndex = myObject.size(); // Use the size of the vector to determine the next index
+                    cubeIndex = myGameObject.size(); // Use the size of the vector to determine the next index
 
                     gameObject newCube; // Assuming Cube is a struct or class with position, scale, model and textureID members
 
@@ -453,9 +490,9 @@ unsigned int loadTexture(const std::string& filePath);
                         break;
                     default: // cube No5
 
-                        newCube.position = glm::vec3(posy, 0.0f, -2.0f); // Default position for any additional cubes
+                        newCube.position = glm::vec3(posx, 0.0f, -2.0f); // Default position for any additional cubes
                         newCube.scale = glm::vec3(1.0f, 1.0f, 1.0f); // Default scale
-                        posy += 1.5;
+                        posx += 1.5;
                         break;
                     }
                     // Initialize model matrix
@@ -465,18 +502,18 @@ unsigned int loadTexture(const std::string& filePath);
 
                     newCube.textureID = loadTexture("Textures/default.jpg");
                     // Add the new cube to the vector or a object obj or light, Texture
-                    myObject.push_back(newCube);
+                    myGameObject.push_back(newCube);
 
                     shouldAddCube = false;
                     std::cout << "Cube Index " << cubeIndex << std::endl;
                 }
-                // Update positions and models for all cubes
-                for (auto& cube : myObject) {
+                // Update positions and models for all cubes ## redundent code
+                //for (auto& cube : myGameObject) {
 
-                    cube.model = glm::mat4(1.0f); // Reset to identity matrix
-                    cube.model = glm::translate(cube.model, cube.position); // Apply new translation
-                    cube.model = glm::scale(cube.model, cube.scale);
-                }
+                //    cube.model = glm::mat4(1.0f); // Reset to identity matrix
+                //    cube.model = glm::translate(cube.model, cube.position); // Apply new translation
+                //    cube.model = glm::scale(cube.model, cube.scale);
+                //}
                 // Update object position scale texture ect
                 if (shouldUpdateObject) {
 
@@ -499,9 +536,9 @@ unsigned int loadTexture(const std::string& filePath);
                         shouldDeleteObject = false; // Reset the flag
                     }
                 }
-
+               
                 // Render all cubes
-                for (auto& cube : myObject) {
+                for (auto& cube : myGameObject) {
                     ShaderManager::LightCubeShader->Use();
                     ShaderManager::LightCubeShader->setMat4("projection", projection);
                     ShaderManager::LightCubeShader->setMat4("view", view);

@@ -21,12 +21,7 @@
 bool gridNogrid = false;   // Show the grid or hide it
 
 // #########################################  New Game Objects  ########################################
-struct gameObject { // this was cube1
-      glm::vec3 position;
-      glm::mat4 model;
-      glm::vec3 scale;
-      unsigned int textureID;     
-};
+
 
 int objectUpdateIndex = -1;
 
@@ -49,7 +44,14 @@ bool rotateCube = false;     // rotate a cube
 bool shouldAddCube = false; // Add a cube with a button click
 bool addStartUpObject = true; // add the start up objects
 
-std::vector<gameObject> myObject; // Add a Object with a button click, changed from mycubes
+struct gameObject { // this was cube1
+    glm::vec3 position;
+    glm::mat4 model;
+    glm::vec3 scale;
+    unsigned int textureID;
+};
+
+std::vector<gameObject> myGameObject; // Add a Object to the main VECTOR ##############
 
 struct GameData { // change from Data1, This is now the main Data for all objects
     int index;  
@@ -63,6 +65,7 @@ GameData* selectedData = nullptr;
 
 
 // #########################################  Lighting ########################################
+
 float ambient_factor[1] = { 0.1f };
 float amb_light[4] = {
     1.0f, 1.0f, 1.0f, 1.0f
@@ -70,33 +73,39 @@ float amb_light[4] = {
 float move_light[3] = {
     0.0f, 1.0f, 6.0f
 };
-
-struct LightData {
-    //int currentLightIndex;
-    //std::string name;
-    int LightIndex;
-    int LightType; // Sun, Ambient, Spot
+float lightPos[3] = {
+    0.0f, 1.0f, 1.0f
 };
 
-//int currentLightIndex = 0;
-int LightIndex = 0;
+struct LightObject { // this the new light vector
+    glm::vec3 position;
+    glm::mat4 model;
+    glm::vec3 scale;
 
-bool lightingTest = false;
+};
 
-LightData* selectedLightData = nullptr;
-bool shouldAddLight = false;
-std::vector<LightData> myLights;
+std::vector<LightObject> myLightObject; // Add a Light to the main VECTOR ##############
+
+
+struct LightData { // change from Data1, This is now the main Data for all objects
+    int index;
+    //std::string objectName;
+    std::string LightName;
+    //int objectIndex;
+    int LightIndex;
+    //int ObjectTypeID;
+    int LightTypeID;
+
+};
+
+int lightIndex = 0; // this is the index of how many lights we have
+
+bool lightGUIShow = false; // this shows the ;ight control panel
+
+bool shouldAddLight = false; // this is to add a new light on button click
+
 
 // #########################################  End Lighting ########################################
-
-// #########################################  Camera       ########################################
-
-    struct Camera1 {
-        std::string name;
-        int camId;
-    };
-    Camera1* selectedCamData = nullptr;
-// #########################################  End Camera start Terrain ########################################
 
     struct Terrain {
         std::string name;
@@ -216,8 +225,8 @@ std::vector<LightData> myLights;
                         objectUpdateIndex = selectedData->objectIndex; // just added
                         if (objectUpdateIndex != -1) {
                             std::cout << "Updating texture for cube index: " << objectUpdateIndex << std::endl;
-                            myObject[objectUpdateIndex].textureID = loadTexture(myTexturePath);
-                            std::cout << "New texture ID: " << myObject[objectUpdateIndex].textureID << std::endl;
+                            myGameObject[objectUpdateIndex].textureID = loadTexture(myTexturePath);
+                            std::cout << "New texture ID: " << myGameObject[objectUpdateIndex].textureID << std::endl;
 
                             crateMap = loadTexture((myTexturePath).c_str());
 
@@ -273,7 +282,7 @@ std::vector<LightData> myLights;
 
                 if (ImGui::Button("Update Light")) {
                     selectedData->objectName = nameBuffer;
-                    //selectedData->currentLightIndex();
+                    //selectedData->currentlightIndex();
                     //objectUpdateIndex = selectedData->objectIndex; // Ensure this is set correctly
                     std::cout << "update Lighting : " << objectUpdateIndex << std::endl;
                     showLightEditor = false;
@@ -283,7 +292,7 @@ std::vector<LightData> myLights;
             }
             ImGui::End();
         }
-
+          // NOT Working correctly yet
             void cloneSelectedItem(std::vector<GameData>&myVector, GameData * selectedData, int& currentIndex) {
                 if (selectedData) {
                     GameData clonedItem = *selectedData;
@@ -291,6 +300,7 @@ std::vector<LightData> myLights;
                     myVector.push_back(clonedItem);
                 }
             }
+            // NOT Working correctly yet
             void deleteObject(std::vector<GameData>&myVector, GameData * selectedData, int& currentIndex, int& indexCube,
                 int& indexPlane, int& indexSphere) {
                 // will need to see if the index is in the vector and not at the end           
@@ -324,6 +334,7 @@ std::vector<LightData> myLights;
                     myVector.push_back({ currentIndex++, ICON_FA_CUBE" DefaultCube_", indexCube++, OBJ_CUBE });
                     ObjectTypeID = OBJ_LIGHT_0;
                     myVector.push_back({ currentIndex++, ICON_FA_CUBE" DefaultLight_", indexLight++, OBJ_LIGHT_0 });
+                    //myLightObject.push_back({ currentIndex++, ICON_FA_CUBE" DefaultLight_", indexLight++, OBJ_LIGHT_0 });
 
                 }
 
@@ -339,6 +350,7 @@ std::vector<LightData> myLights;
                 if (ImGui::Button(ICON_FA_LIGHTBULB " Add Light   ")) {
                     ObjectTypeID = OBJ_LIGHT_0; // Light
                     myVector.push_back({ currentIndex++, ICON_FA_LIGHTBULB" DefaultLight_", indexLight++, OBJ_LIGHT_0 });
+                    
                     shouldAddLight = true;
                 }
 
@@ -399,11 +411,11 @@ std::vector<LightData> myLights;
 
                             switch (data.ObjectTypeID) { // select which editor we need
                             case 0: // Main camera
-                                lightingTest = false;
+                                lightGUIShow = false;
                                 std::cout << " you selected the Camera " << data.ObjectTypeID << std::endl;
                                 break;
                             case 1: // Default Global Light
-                                lightingTest = true;
+                                lightGUIShow = true;
                                 std::cout << " you selected the Light1 " << data.ObjectTypeID << std::endl;
                                 break;
                             case 2: // Ambiant Light
@@ -414,7 +426,7 @@ std::vector<LightData> myLights;
                                 std::cout << " you selected the Light3 " << data.ObjectTypeID << std::endl;
                                 break;
                             case 4: // Cube
-                                lightingTest = false;
+                                lightGUIShow = false;
                                 std::cout << " you selected the Light3 " << data.ObjectTypeID << std::endl;
                                // this->showObjectEditor = true;
                                 break;
@@ -424,9 +436,9 @@ std::vector<LightData> myLights;
                             }
 
                         }
-
+                        // ################################## SAVE THIS FOR USE LATER USE ##################
                         if (nodeOpen) {
-                            // this->onRightClick();
+                             this->onRightClick();
 
                             if (ImGui::IsItemHovered()) {
 
@@ -440,39 +452,39 @@ std::vector<LightData> myLights;
                                 ImGui::TextColored(COLOR_LIGHTBLUE, ICON_FA_EDIT "  Entity");
                                 ImGui::Separator();
 
-                                if (ImGui::Selectable(ICON_FA_PEN_ALT " Edit")) {
-                                    selectedData = &data;
-                                    strncpy_s(nameBuffer, data.objectName.c_str(), sizeof(nameBuffer));
-                                    nameBuffer[sizeof(nameBuffer) - 1] = '\0'; // ensure null-termination
+                                //if (ImGui::Selectable(ICON_FA_PEN_ALT " Edit")) {
+                                //    selectedData = &data;
+                                //    strncpy_s(nameBuffer, data.objectName.c_str(), sizeof(nameBuffer));
+                                //    nameBuffer[sizeof(nameBuffer) - 1] = '\0'; // ensure null-termination
 
-                                    switch (data.ObjectTypeID) { // select which editor we need
-                                    case 0: // camera
-                                        std::cout << " you selected the Camera " << data.ObjectTypeID << std::endl;
-                                        break;
-                                    case 1: // Default Global Light
-                                        this->showLightEditor = true;
-                                        std::cout << " you selected the Light1 " << data.ObjectTypeID << std::endl;
-                                        break;
-                                    case 2: // Ambiant Light
-                                        
-                                        std::cout << " you selected the Light2 " << data.ObjectTypeID << std::endl;
-                                        break;
-                                    case 3: // Point Light
-                                        std::cout << " you selected the Light3 " << data.ObjectTypeID << std::endl;
-                                        break;
-                                    case 4: // Cube
-                                        this->showObjectEditor = true;
-                                        break;
+                                //    switch (data.ObjectTypeID) { // select which editor we need
+                                //    case 0: // camera
+                                //        std::cout << " you selected the Camera " << data.ObjectTypeID << std::endl;
+                                //        break;
+                                //    case 1: // Default Global Light
+                                //        this->showLightEditor = true;
+                                //        std::cout << " you selected the Light1 " << data.ObjectTypeID << std::endl;
+                                //        break;
+                                //    case 2: // Ambiant Light
+                                //        
+                                //        std::cout << " you selected the Light2 " << data.ObjectTypeID << std::endl;
+                                //        break;
+                                //    case 3: // Point Light
+                                //        std::cout << " you selected the Light3 " << data.ObjectTypeID << std::endl;
+                                //        break;
+                                //    case 4: // Cube
+                                //        this->showObjectEditor = true;
+                                //        break;
 
-                                    default:
-                                        break;
-                                    }
+                                //    default:
+                                //        break;
+                                //    }
 
-                                }
+                                //}
 
-                                if (ImGui::Selectable(ICON_FA_PLUS " New")) {
-                                    // Not sure yet
-                                }
+                                //if (ImGui::Selectable(ICON_FA_PLUS " New")) {
+                                //    // Not sure yet
+                                //}
                                 if (ImGui::Selectable(ICON_FA_COPY " Clone")) {
                                     // clone current object
                                     cloneSelectedItem(myVector, selectedData, currentIndex);
@@ -495,17 +507,18 @@ std::vector<LightData> myLights;
                     ImGui::TreePop();
                 }
 
+                //############################################### START ##############################################
+                
+                // ########################################## END ##############################################
+
                 if (showObjectEditor) {
                     renderObjectEditor(selectedData, showObjectEditor); // Render the name editor window
                 }
                 if (showLightEditor) {
                     //renderLightEditor(selectedData, showLightEditor); // Render the light editor window
-                    //lightingTest = true;
+                    //lightGUIShow = true;
                 }
-                /*if (int test = 1) {
-
-                    lightingTest = true;
-                }*/
+               
 
                 
 
@@ -518,20 +531,23 @@ std::vector<LightData> myLights;
                 ImGui::Begin(ICON_FA_CUBES" Properties");
                 if (ImGui::BeginTabBar("##Main", ImGuiTabBarFlags_None))
                 {
-                    
+                                        
                     if (ImGui::BeginTabItem("Properties"))
                     {
 
                         ImGui::SeparatorText(ICON_FA_SPIDER" Settings");
                         if (selectedData) {
-                            ImGui::InputText("Object Name", selectedData->objectName.data(), selectedData->objectName.size());
-                            
+                          //ImGui::InputText("Object Name", selectedData->objectName.data(), selectedData->objectName.size());
+                            ImGui::InputText("Object Name", nameBuffer, IM_ARRAYSIZE(nameBuffer));
+                            //ImGui::InputText("Object Name", selectedData->objectName.data(), selectedData->objectName.size(), IM_ARRAYSIZE(nameBuffer));
                         }
                         else {
                             ImGui::Text("No data selected");
                         }
 
+                            //only showe button if a valid index is selected
                         if (ImGui::Button("Update Object")) {
+                            //only update if a valid index is selected
                             selectedData->objectName = nameBuffer;
                             shouldUpdateObject = true;
                             objectUpdateIndex = selectedData->objectIndex; // Ensure this is set correctly
@@ -639,8 +655,8 @@ std::vector<LightData> myLights;
                                     objectUpdateIndex = selectedData->objectIndex; // just added
                                     if (objectUpdateIndex != -1) {
                                         std::cout << "Updating texture for cube index: " << objectUpdateIndex << std::endl;
-                                        myObject[objectUpdateIndex].textureID = loadTexture(myTexturePath);
-                                        std::cout << "New texture ID: " << myObject[objectUpdateIndex].textureID << std::endl;
+                                        myGameObject[objectUpdateIndex].textureID = loadTexture(myTexturePath);
+                                        std::cout << "New texture ID: " << myGameObject[objectUpdateIndex].textureID << std::endl;
 
                                         crateMap = loadTexture((myTexturePath).c_str());
 
@@ -665,7 +681,7 @@ std::vector<LightData> myLights;
                             
                         }
                                             // ##### LIGHTING #####
-                        if (lightingTest) { 
+                        if (lightGUIShow) { 
                             if (ImGui::CollapsingHeader(ICON_FA_LIGHTBULB" Lighting", ImGuiTreeNodeFlags_DefaultOpen))
                             {
                                 
@@ -674,10 +690,12 @@ std::vector<LightData> myLights;
                                 ImGui::Text("Change Ambient Factor");
                                 ImGui::DragFloat("Ambient", ambient_factor, 0.0f);
                                 ImGui::Text("Light Position");
-                                ImGui::DragFloat3("Position", move_light, 0.0f, 1.0f, 6.0f);
+                                ImGui::DragFloat3("Position", lightPos, 0.0f, 0.0f, 0.0f);
                                 ImGui::Text("Change light color");                         
                             
                                 ImGui::ColorEdit4("Color", amb_light);
+
+                                // we need to store any info enterd here
                             }
                             
                         }
@@ -698,8 +716,6 @@ std::vector<LightData> myLights;
 
                         // add a selection of skys to pick from maybe a folder or an image showing the type sky
                         ImGui::Columns(3);
-
-
 
                         ImGui::SetCursorPosX((ImGui::GetColumnWidth() - 135) * 0.5f + ImGui::GetColumnOffset());// BlueSky
                         if (ImGui::ImageButton((void*)(intptr_t)texture1, ImVec2(135, 135))) {
@@ -727,8 +743,6 @@ std::vector<LightData> myLights;
                             skyTextureID = LoadSkybox(skyboxSets[selectedSkyboxIndex]);
                             addSky = true;
                         }
-
-
 
                         ImGui::Columns(1); // Reset columns
                         ImGui::Separator(); // Optional: Add a separator line
@@ -827,15 +841,6 @@ std::vector<LightData> myLights;
 
                     ImGui::EndTabBar();
 
-
-                //if (ImGui::Button("Update Object")) {
-                //    selectedData->objectName = nameBuffer;
-                //    shouldUpdateObject = true;
-                //    objectUpdateIndex = selectedData->objectIndex; // Ensure this is set correctly
-                //    std::cout << "Object update index set to: " << objectUpdateIndex << std::endl;
-                //    //showObjectEditor = false;
-                //}
-
                 ImGui::Text("This all seemes to be working");
 
                 }
@@ -843,29 +848,17 @@ std::vector<LightData> myLights;
                 ImGui::End();
             }           
             
-            
-
-    private:
-        // GameData* selectedData = nullptr;      
+    private:   
 
         bool showObjectEditor = false; // for editing the cubes
         bool showLightEditor = false; // for editing lighting
-        bool cameraAdded = false;
+        //bool cameraAdded = false;
 
-        bool hideObject = false;
-
-        Camera1 defaultCamera = { ICON_FA_VIDEO " MainCamera ", 0 };// maincamera with id 0       
+        bool hideObject = false;    // not used yet 
 
         char nameBuffer[128] = ""; // for renaming the cubes
         
-
-        
-
-        int fill = 20; // use this to change how many squares in the grid
         bool isSelected = false; // flag to check if a node is selected
-
-
-
 
         void onRightClick() {
             if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
