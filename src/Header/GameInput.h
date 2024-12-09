@@ -30,6 +30,12 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
 
+    // UP - Down
+    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+        camera.ProcessKeyboard(UP, deltaTime);
+    else if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+        camera.ProcessKeyboard(UP, -deltaTime);
+
     // change widows Opacity 
     if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
         glfwSetWindowOpacity(window, 0.5f);

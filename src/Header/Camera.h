@@ -8,7 +8,8 @@ enum Camera_Movement {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP
 };
 
 // Default camera values
@@ -75,6 +76,9 @@ public:
             Position -= Right * velocity;
         if (direction == RIGHT)
             Position += Right * velocity;
+
+        if (direction == UP)
+            Position += Up * velocity;
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
